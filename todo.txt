@@ -1,0 +1,19 @@
+-poprawić wytłuszczanie zakładki w sidenavbar
+-wykresy oczywiscie
+-walidacja js'owa
+
+
+
+-opłaty
+    -jeżeli data nie jest 0000-00-00, a wprowadzona kwota w pasującej dacie = 00, wykreśl; usuń z bazy danych jeżeli data wygaśnięcia mija
+    -powiadomienia "uwaga, opłata za to wygasa tego i tego dnia. usunąć, czy przedłużyć?" - tylko dla nieopłaconych
+
+-budzet
+    -zmiana kolorkow- jezeli budzet bliski wyczerpaniu: na czerwono
+
+
+-wypłata:
+    -jeżeli użytkownik doda nową wypłatę, a w total wciąż pozostało mu coś ze starej-> modal: usunąć starą, dodać resztę starej do nwoej, dodać resztę starej do oszczędności
+
+-opłaty $ budżet
+    -poprawić: jeśli wpłacone przekracza założone, zacząć odejmować od total    
