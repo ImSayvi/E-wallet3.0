@@ -20,7 +20,7 @@ if (isset($_POST['save_daily'])) {
 
     $daily->insertDaily();
 
-    $budget->setBudgetName($category);
+    $budget->setBudgetCategory($category);
     $budget->setBudgetAmount($_POST['amountInput']);
     $budget->putIntoBudgetHistory();
 }
@@ -71,7 +71,7 @@ $dzienne->setIdUser($_SESSION['idUser']);
                                 <option selected>wybierz kategorię</option>
                                 <option value="other">Inne</option>
                                 <?php foreach ($categories as $category) : ?>
-                                    <option value="<?=$category['categoryName'];?>"><?php echo $category['categoryName'];?></option>
+                                    <option value="<?=$category['categories'];?>"><?php echo $category['categories'];?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>

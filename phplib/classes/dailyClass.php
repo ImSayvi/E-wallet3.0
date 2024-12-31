@@ -89,16 +89,30 @@ class DailyConfig{
     }
 
     public function getAllPositiveDaily(){
-        $stm = $this->conn->prepare("SELECT * FROM dailytransactions WHERE Users_idUser = ? AND DTamount > 0 ORDER BY DTdate DESC");
-        $stm->execute([$this->Users_idUser]);
+        $lastIncome = new IncomeConfig();
+        $lastIncome->setUsers_idUser($this->Users_idUser);
+        $lastIncome->fetchLastIncome();
+        $lastIncomeDate = $lastIncome[0]['incomeDate'];
+        $lastIncomeDateFormated = strtotime($lastIncomeDate);
+        $lastIncomeDatePlusMonth = strtotime('+1 month', $lastIncomeDateFormated);
+
+        $stm = $this->conn->prepare("SELECT * FROM dailytransactions WHERE Users_idUser = ? AND DTamount > 0 AND DTdate >= ? AND DTdate <= ? ORDER BY DTdate DESC");
+        $stm->execute([$this->Users_idUser, $lastIncomeDateFormated, $lastIncomeDatePlusMonth]);
         $result = $stm->fetchAll();
 
         return $result;
     }
 
     public function getAllNegativeDaily(){
-        $stm = $this->conn->prepare("SELECT * FROM dailytransactions WHERE Users_idUser = ? AND DTamount < 0 ORDER BY DTdate DESC");
-        $stm->execute([$this->Users_idUser]);
+        $lastIncome = new IncomeConfig();
+        $lastIncome->setUsers_idUser($this->Users_idUser);
+        $lastIncome->fetchLastIncome();
+        $lastIncomeDate = $lastIncome[0]['incomeDate'];
+        $lastIncomeDateFormated = strtotime($lastIncomeDate);
+        $lastIncomeDatePlusMonth = strtotime('+1 month', $lastIncomeDateFormated);
+
+        $stm = $this->conn->prepare("SELECT * FROM dailytransactions WHERE Users_idUser = ? AND DTamount < 0 AND DTdate >= ? AND DTdate <= ? ORDER BY DTdate DESC");
+        $stm->execute([$this->Users_idUser, $lastIncomeDateFormated, $lastIncomeDatePlusMonth]);
         $result = $stm->fetchAll();
 
         return $result;

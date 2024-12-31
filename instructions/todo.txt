@@ -17,3 +17,6 @@
 
 -opłaty $ budżet
     -poprawić: jeśli wpłacone przekracza założone, zacząć odejmować od total    
+
+-walidacja
+    -czy wprowadzana nazwa katgorii już gdzies nie wystepuje    

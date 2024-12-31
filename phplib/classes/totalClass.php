@@ -53,15 +53,15 @@ class TotalConfig{
         return $this->userTotal;
     }
 
-    public function totalIncome(){
-        $stm = $this->conn->prepare("SELECT SUM(incomeAmount) AS totalIncome FROM income WHERE Users_idUser = ?");
-        $stm->execute([$this->idUser]);
-        $result = $stm->fetch(); 
-        return $result['totalIncome'] ?? 0; 
+    // public function totalIncome(){
+    //     $stm = $this->conn->prepare("SELECT SUM(incomeAmount) AS totalIncome FROM income WHERE Users_idUser = ?");
+    //     $stm->execute([$this->idUser]);
+    //     $result = $stm->fetch(); 
+    //     return $result['totalIncome'] ?? 0; 
 
-        $this->userTotal = $result['totalIncome'];
+    //     $this->userTotal = $result['totalIncome'];
     
-    }
+    // }
     
     public function totalDaily(){
         $stm = $this->conn->prepare("SELECT SUM(DTamount) AS totalDaily FROM dailyTransactions WHERE Users_idUser = ?");
@@ -72,13 +72,33 @@ class TotalConfig{
         return $result['totalDaily'];
     }
 
+    public function checkLimitForCategories(){
+        $stm = $this->conn->prepare("
+        select budgetCategory as categories, budgetAmount as amount from budget where Users_idUser = ?
+        union
+        select chargeCategory, chargeAmount from charges where Users_idUser = ?
+        union
+        select savingCategory, savingAmount from savings where Users_idUser = ?
+        ");
+
+        $stm->execute([$this->idUser, $this->idUser, $this->idUser]);
+        $result = $stm->fetchAll();
+        
+        return $result;
+    }
+
     public function totalDailyWithoutCategories(){
-        $stm = $this->conn->prepare("SELECT SUM(DTamount) AS totalDaily FROM dailyTransactions WHERE Users_idUser = ? AND DTname NOT IN (SELECT categoryName FROM financecategories WHERE Users_idUser = ?)");
-        $stm->execute([$this->idUser, $this->idUser]);
+        $categories = $this->checkLimitForCategories();
+
+        $catAmArr = array_column($categories, 'amount');
+        $totalCatAm = array_sum($catAmArr);
+
+        $stm = $this->conn->prepare("SELECT SUM(DTamount) AS totalDaily FROM dailyTransactions WHERE Users_idUser = ?");
+        $stm->execute([$this->idUser]);
         $result = $stm->fetch(); 
         $result['totalDaily'] ?? 0; 
 
-        return $result['totalDaily'];
+        return $result['totalDaily'] - $totalCatAm;
     }
 
     public function totalCharge(){
@@ -111,7 +131,7 @@ class TotalConfig{
         $stm->execute([$this->userTotal, $this->idUser]);
     }
 
-    public function calculateDaily() {
+    public function calculateDaily() { //do naprawy
         $getDate = new IncomeConfig();
         $getDate->setUsers_idUser($this->idUser);
         $lastIncome = $getDate->fetchLastIncome();

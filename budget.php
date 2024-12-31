@@ -195,10 +195,5 @@ if (isset($_POST['edit_budget']) && isset($_GET['req']) && $_GET['req'] == 'edit
         </div>
     </div>
 
-<!-- <script>
-    function setStorage(value) {
-        document.getElementById('budgetWhere').value = value;
-    }
-</script> -->
  
     <?php include ('includes/footer.php'); ?>
