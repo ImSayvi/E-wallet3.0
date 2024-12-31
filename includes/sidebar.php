@@ -1,14 +1,5 @@
 <?php
-include_once('phplib/classes/categoryClass.php');
 include_once('phplib/classes/chargeClass.php');
-
-$charge = new ChargeConfig();
-$charge->setUsers_idUser($_SESSION['idUser']);
-$allChargesBydate = $charge->fetchAllChargesByDate();
-$chargeName = new CategoryConfig();
-$chargeName->setUsers_idUser($_SESSION['idUser']);
-
-
 
 ?>
 
@@ -83,9 +74,9 @@ $chargeName->setUsers_idUser($_SESSION['idUser']);
     <div id="collapseToPayCharges" class="collapse show" aria-labelledby="headingUtilities"
         data-parent="#accordionSidebar">
         <div class="bg-white py-2 collapse-inner rounded">
-        <?php foreach($allChargesBydate as $charge): ?>
-            <a class="collapse-item" href="charges.php"><?=$chargeName->getCategoryName($charge['idCategory']) ?> <span class="text-danger float-right"><?=$charge['chargeAmount']?></span></a>
-        <?php endforeach; ?>    
+        <?php //foreach($allChargesBydate as $charge): ?>
+            <a class="collapse-item" href="charges.php">nazwa <span class="text-danger float-right">kwota</span></a>
+        <?php //endforeach; ?>    
         </div>
     </div>
 </li>

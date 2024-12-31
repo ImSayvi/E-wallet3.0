@@ -7,7 +7,7 @@ $charge->setUsers_idUser($_SESSION['idUser']);
 // inserting charge
 if(isset($_POST['save_charge'])){
     $charge->setChargeAmount($_POST['chargesAmount']);
-    $charge->setChargeName($_POST['chargesCategory']);
+    $charge->setChargeCategory($_POST['chargesCategory']);
     $charge->setChargeAddDate(date('Y-m-d'));
     if(isset($_POST['chargesExpiry']) && $_POST['chargesExpiry'] == 1){
         $charge->setChargeExpiryDate(date('Y-m-d', strtotime("+1 month", strtotime($charge->getChargeAddDate()))));
@@ -22,11 +22,10 @@ $allChargesBydate = $charge->fetchAllChargesByDate();
 $chargeName = new CategoryConfig();
 $chargeName->setUsers_idUser($_SESSION['idUser']);
 
-//deleting charge and its category
+//deleting charge 
 if (isset($_GET['idCharge']) && isset($_GET['req'])){
     if ($_GET['req'] == 'delete'){
         $charge->setIdCharge($_GET['idCharge']);
-        $charge->setIdChargeCategory($_GET['idCategory']);
         $charge->deleteCharge();
 
     }
@@ -37,14 +36,13 @@ if (isset($_GET['idCharge']) && isset($_GET['req'])){
 if (isset($_POST['edit_charge']) && isset($_GET['req']) && $_GET['req'] == 'edit') {
    
         $charge->setIdCharge($_GET['idCharge']);
-        $charge->setIdChargeCategory($_GET['idCategory']);
         $charge->setChargeAmount($_POST['chargesAmount']);
         if(isset($_POST['chargesExpiry']) && $_POST['chargesExpiry'] == 1){
             $charge->setChargeExpiryDate(date('Y-m-d', strtotime("+1 month", strtotime($charge->getChargeAddDate()))));
         }else{
             $charge->setChargeExpiryDate('0000-00-00');
         }
-        $charge->setChargeName($_POST['chargesCategory']);
+        $charge->setChargeCategory($_POST['chargesCategory']);
         $charge->setChargeAddDate(date('Y-m-d'));
 
         $charge->updateCharge();
@@ -131,12 +129,12 @@ if (isset($_POST['edit_charge']) && isset($_GET['req']) && $_GET['req'] == 'edit
 
                             <?php foreach ($allChargesBydate as $charge): ?>
                                 <tr>
-                                    <td><?= $chargeName->getCategoryName($charge['idCategory']) ?></td>
+                                    <td><?= $charge['chargeCategory'] ?></td>
                                     <td><?= $charge['chargeAmount'] ?></td>
                                     <td>100</td>
                                     <td>20.11.2024</td>
                                     <td class="text-center">
-                                    <a href="charges.php?idCharge=<?= $charge['idCharge']?>&idCategory=<?=$charge['idCategory'] ?>&req=edit" 
+                                    <a href="charges.php?idCharge=<?= $charge['idCharge']?>&req=edit" 
                                         class="btn btn-warning btn-circle btn-sm edit-charge-btn" 
                                         data-target="#editCharge<?= $charge['idCharge']?>"
                                         data-toggle = "modal"
@@ -145,10 +143,10 @@ if (isset($_POST['edit_charge']) && isset($_GET['req']) && $_GET['req'] == 'edit
                                     </a>
                                            <?php 
                                            $editModal = new ModalCreator();
-                                           echo $editModal->createEditChargesModal($charge['idCharge'], $charge['chargeAmount'], $chargeName->getCategoryName($charge['idCategory']), $charge['chargeExpiryDate'], $charge['idCategory']);
+                                           echo $editModal->createEditChargesModal($charge['idCharge'], $charge['chargeAmount'], $charge['chargeCategory'], $charge['chargeExpiryDate']);
                                            ?>
                                         
-                                        <a href="charges.php?idCharge=<?= $charge['idCharge'] ?>&idCategory=<?= $charge['idCategory'] ?>&req=delete" 
+                                        <a href="charges.php?idCharge=<?= $charge['idCharge'] ?>&req=delete" 
                                            class="btn btn-danger btn-circle btn-sm">
                                            <i class="fas fa-trash"></i>
                                         </a>

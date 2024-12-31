@@ -7,7 +7,7 @@ $budget->setUsers_idUser($_SESSION['idUser']);
 
 //insertowanie budżetu
 if(isset($_POST['save_budget'])){
-    $budget->setBudgetName($_POST['budgetName']);
+    $budget->setBudgetCategory($_POST['budgetName']);
     $budget->setBudgetAmount($_POST['budgetAmount']);
     $budget->setBudgetWhere($_POST['budgetWhere']);
     $budget->setBudgetAddDate(date('Y-m-d'));
@@ -22,7 +22,6 @@ $budgetName->setUsers_idUser($_SESSION['idUser']);
 //usuwanie budżetów i ich nazw
 if(isset($_GET['req']) && $_GET['req'] == 'delete'){
     $budget->setIdBudget($_GET['idBudget']);
-    $budget->setIdCategory($_GET['idCategory']);
     $budget->deleteBudget();
 }
 
@@ -30,10 +29,9 @@ if(isset($_GET['req']) && $_GET['req'] == 'delete'){
 if (isset($_POST['edit_budget']) && isset($_GET['req']) && $_GET['req'] == 'edit') {
    
     $budget->setIdbudget($_GET['idBudget']);
-    $budget->setIdCategory($_GET['idCategory']);
     $budget->setBudgetAmount($_POST['budgetAmount']);
     $budget->setBudgetWhere($_POST['budgetWhere']);
-    $budget->setBudgetName($_POST['budgetName']);
+    $budget->setBudgetCategory($_POST['budgetName']);
     // $budget->setbudgetAddDate(date('Y-m-d'));
 
     $budget->updatebudget();
@@ -65,7 +63,7 @@ if (isset($_POST['edit_budget']) && isset($_GET['req']) && $_GET['req'] == 'edit
                                         <div class="card-body">
                                             <div class="row no-gutters align-items-center" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample" href="#collapseBudget<?= $budget['idBudget'] ?>">
                                                 <div class="col mr-2">
-                                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1"><?= $budgetName->getCategoryName($budget['idCategory']) ?></div>
+                                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1"><?= $budget['budgetCategory'] ?></div>
                                                     <div class="row no-gutters align-items-center">
                                                         <div class="col-auto">
                                                             <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800"><?= $budget['budgetAmount'] ?> zł</div>
@@ -89,7 +87,7 @@ if (isset($_POST['edit_budget']) && isset($_GET['req']) && $_GET['req'] == 'edit
                                                         <!-- <button type="button" class="btn btn-primary btn-sm mb-1 mr-2" id="addBudgetBtn" data-toggle="modal" data-target="#addBudgetModal">
                                                             Edytuj <i class="fa-regular fa-pen-to-square"></i>
                                                         </button> -->
-                                                        <a href="budget.php?idBudget=<?= $budget['idBudget']?>&idCategory=<?=$budget['idCategory'] ?>&req=edit" 
+                                                        <a href="budget.php?idBudget=<?= $budget['idBudget']?>&req=edit" 
                                                             class="btn btn-primary btn-sm mb-1 mr-2" 
                                                             data-target="#editBudget<?= $budget['idBudget']?>"
                                                             data-toggle = "modal"
@@ -99,7 +97,7 @@ if (isset($_POST['edit_budget']) && isset($_GET['req']) && $_GET['req'] == 'edit
                                                             
 
 
-                                                        <a href="budget.php?idBudget=<?= $budget['idBudget'] ?>&idCategory=<?= $budget['idCategory'] ?>&req=delete" 
+                                                        <a href="budget.php?idBudget=<?= $budget['idBudget'] ?>&req=delete" 
                                                         class="btn btn-danger btn-sm mb-1">Usuń
                                                         <i class="fas fa-trash"></i>
                                                         </a>
@@ -143,7 +141,7 @@ if (isset($_POST['edit_budget']) && isset($_GET['req']) && $_GET['req'] == 'edit
                                 </div>
                                 <?php 
                                     $editModal = new ModalCreator();
-                                    echo $editModal->createEditBudgetModal($budget['idBudget'], $budgetName->getCategoryName($budget['idCategory']), $budget['budgetAmount'], $budget['budgetWhere'], $budget['idCategory']);
+                                    echo $editModal->createEditBudgetModal($budget['idBudget'], $budget['budgetCategory'], $budget['budgetAmount'], $budget['budgetWhere']);
                                 ?>
                             <?php endforeach ?>
                         </div>

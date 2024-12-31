@@ -88,10 +88,7 @@ class IncomeConfig{
             $stm->execute([$this->Users_idUser]);
             $result = $stm->fetchAll();
     
-            if (empty($result)) {
-                return []; // Zwróć pustą tablicę, jeśli brak wyników
-            }
-            return $result;
+            return $result ?? 0;
         } catch (Exception $e) {
             error_log("Błąd w fetchLastIncome: " . $e->getMessage());
             return [];

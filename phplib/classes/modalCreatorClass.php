@@ -2,7 +2,7 @@
 
 class ModalCreator {
 
-    public function createEditChargesModal($modalId, $chargeAmount, $chargeCategory, $chargeExpiry, $idCategory) {
+    public function createEditChargesModal($modalId, $chargeAmount, $chargeCategory, $chargeExpiry,) {
 
         $chargeAmount = htmlspecialchars($chargeAmount, ENT_QUOTES, 'UTF-8');
         $chargeCategory = htmlspecialchars($chargeCategory, ENT_QUOTES, 'UTF-8');
@@ -18,7 +18,7 @@ class ModalCreator {
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form method="POST" action="charges.php?idCharge='.$modalId.'&idCategory='.$idCategory.'&req=edit">
+                    <form method="POST" action="charges.php?idCharge='.$modalId.'&req=edit">
                         <div class="modal-body">
                             <div class="mb-3">
                                 <label for="chargesAmount" class="form-label float-left">Kwota</label>
@@ -47,7 +47,7 @@ class ModalCreator {
         return $html;
     }
 
-    public function createEditBudgetModal($modalId, $budgetName, $budgetAmount, $budgetWhere, $idCategory) {
+    public function createEditBudgetModal($modalId, $budgetName, $budgetAmount, $budgetWhere) {
         // Zmienna $budgetWhere nie musi zawierać " checked" w tej metodzie
         $html = '
                 <div class="modal fade" id="editBudget'.$modalId.'" tabindex="-1" role="dialog" aria-labelledby="editBudget'.$modalId.'"
@@ -61,7 +61,7 @@ class ModalCreator {
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <form action="budget.php?idBudget='.$modalId.'&idCategory='.$idCategory.'&req=edit" method="post">
+                                <form action="budget.php?idBudget='.$modalId.'&req=edit" method="post">
                                     <div class="form-group">
                                         <label for="budgetName">Na co?</label>
                                         <input type="text" class="form-control" id="budgetName" name="budgetName" placeholder="Wprowadź nazwę budżetu" value="'.$budgetName.'" required autocomplete="off">

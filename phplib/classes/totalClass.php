@@ -103,7 +103,7 @@ class TotalConfig{
         $lastIncome = new IncomeConfig();
         $lastIncome->setUsers_idUser($this->idUser);
         $lastIncome = $lastIncome->fetchLastIncome();
-        $lastIncomeAmount= $lastIncome[0]['incomeAmount'];
+        $lastIncomeAmount= $lastIncome[0]['incomeAmount'] ?? 0;
         $this->userTotal = $lastIncomeAmount + $this->totalDaily();
         // return $this->userTotal;
 

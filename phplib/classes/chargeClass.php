@@ -8,18 +8,18 @@ class ChargeConfig{
     private $chargeAmount;
     private $chargeAddDate;
     private $chargeExpiryDate;
-    private $chargeName;
-    private $idCategory;
+    private $chargeCategory;
+ 
     protected $conn;
 
 
-    public function __construct($idCharge=0, $Users_idUser=0, $chargeAmount=0, $chargeAddDate='', $chargeExpiryDate='', $chargeName=''){
+    public function __construct($idCharge=0, $Users_idUser=0, $chargeAmount=0, $chargeAddDate='', $chargeExpiryDate='', $chargeCategory=''){
         $this->idCharge = $idCharge;
         $this->Users_idUser = $Users_idUser;
         $this->chargeAmount = $chargeAmount;
         $this->chargeAddDate = $chargeAddDate;
         $this->chargeExpiryDate = $chargeExpiryDate;
-        $this->chargeName = $chargeName;
+        $this->chargeCategory = $chargeCategory;
 
         $this->conn = new PDO(DB_TYPE.':host='.DB_HOST.';dbname='.DB_NAME, DB_USER, DB_PWD, [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
     }
@@ -64,38 +64,23 @@ class ChargeConfig{
         return $this->chargeExpiryDate;
     }
 
-    public function setChargeName($chargeName){
-        $this->chargeName = $chargeName;
+    public function setChargeCategory($chargeCategory){
+        $this->chargeCategory = $chargeCategory;
     }
 
-    public function getChargeName(){
-        return $this->chargeName;
-    }
-
-    public function setIdChargeCategory($idCategory){
-        $this->idCategory = $idCategory;
-    }
-
-    public function getIdChargeCategory(){
-        return $this->idCategory;
+    public function getChargeCategory(){
+        return $this->chargeCategory;
     }
 
     public function insertCharge(){
         try{
-            $cat = new CategoryConfig(0, $this->chargeName, $this->Users_idUser);
+            $stm = $this->conn->prepare("INSERT INTO charges (Users_idUser, chargeAmount, chargeAddDate, chargeExpiryDate, chargeCategory) VALUES (?, ?, ?, ?, ?)");
 
-            if ($cat->addCategory() == false){
-                return false;
-            }else{
-                $stm = $this->conn->prepare("INSERT INTO charges (Users_idUser, chargeAmount, chargeAddDate, chargeExpiryDate, idCategory) VALUES (?, ?, ?, ?, ?)");
-
-                if($this->chargeExpiryDate == '' || $this->chargeExpiryDate == null){
-                    $this->chargeExpiryDate = null;
-                }
-                $this->idCategory = $cat->getIdCategory($this->chargeName, $this->Users_idUser);
-
-                $stm->execute([$this->Users_idUser, $this->chargeAmount, $this->chargeAddDate, $this->chargeExpiryDate, $this->idCategory]);
+            if($this->chargeExpiryDate == '' || $this->chargeExpiryDate == null){
+                $this->chargeExpiryDate = null;
             }
+
+            $stm->execute([$this->Users_idUser, $this->chargeAmount, $this->chargeAddDate, $this->chargeExpiryDate, $this->chargeCategory]);
         }
         catch(PDOException $e){
             echo $e->getMessage();
@@ -130,8 +115,6 @@ class ChargeConfig{
             $stm = $this->conn->prepare('DELETE FROM charges WHERE idCharge = ?');
             $stm->execute([$this->idCharge]);
 
-            $stm2 = $this->conn->prepare('DELETE FROM financecategories WHERE idCategory = ?');
-            $stm2->execute([$this->idCategory]);
         }
         catch(PDOException $e){
             echo $e->getMessage();
@@ -144,11 +127,8 @@ class ChargeConfig{
                 $this->chargeExpiryDate = null;
             }
 
-            $stm = $this->conn->prepare('UPDATE charges SET chargeAmount = ?, chargeAddDate = ?, chargeExpiryDate = ?, idCategory = ? WHERE idCharge = ?');
-            $stm->execute([$this->chargeAmount, $this->chargeAddDate, $this->chargeExpiryDate, $this->idCategory, $this->idCharge]);
-
-            $cat = new CategoryConfig($this->idCategory, $this->chargeName, $this->Users_idUser);
-            $cat->updateCategory($this->idCategory);
+            $stm = $this->conn->prepare('UPDATE charges SET chargeAmount = ?, chargeAddDate = ?, chargeExpiryDate = ?, chargeCategory = ? WHERE idCharge = ?');
+            $stm->execute([$this->chargeAmount, $this->chargeAddDate, $this->chargeExpiryDate, $this->chargeCategory, $this->idCharge]);
         }
         catch(PDOException $e){
             echo $e->getMessage();
