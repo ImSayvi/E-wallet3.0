@@ -119,7 +119,7 @@ $dzienne->setIdUser($_SESSION['idUser']);
                     
                         <div class="col-5 col-lg-2 col-md-4 text-center">
                             <p class="small">masz do wydania<br></p>
-                            <h1 class="font-weight-bold text-gray-900 amount"><?php echo round($dzienne->calculateDailyActuall(),2); ?> <span>zł</span></h1>
+                            <h1 class="font-weight-bold text-gray-900 amount"><?php echo round($dzienne->calculateDailyActuall(),2); ?> <span> zł</span></h1>
                             <div class="small">
                                 <p>dzienny przyrost wydatków: <br><?php echo round($dzienne->calculateDaily(),2); ?>zł</p>
                             </div>

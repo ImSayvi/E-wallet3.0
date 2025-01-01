@@ -99,18 +99,54 @@ class TotalConfig{
     }
 
     public function totalDailyWithoutCategories(){
+
         $categories = $this->checkLimitForCategories();
+       
+        $categoriesExcess = 0;
+        $totalDailyActual = 0;
+    
+        $lastIncome = new IncomeConfig();
+        $lastIncome->setUsers_idUser($this->idUser);
+        $lastIncomeData = $lastIncome->fetchLastIncome();
+    
+        $lastIncomeDate = $lastIncomeData[0]['incomeDate'] ?? date('Y-m-d');
+        $lastIncomeDateFormated = strtotime($lastIncomeDate);
+        $lastIncomeDatePlusMonth = strtotime('+1 month', $lastIncomeDateFormated);
+    
+        $lastIncomeDateSQL = date('Y-m-d', $lastIncomeDateFormated);
+        $lastIncomeDatePlusMonthSQL = date('Y-m-d', $lastIncomeDatePlusMonth);
 
-        $catAmArr = array_column($categories, 'amount');
-        $totalCatAm = array_sum($catAmArr);
+        $stm = $this->conn->prepare("SELECT * FROM dailyTransactions WHERE Users_idUser = ? AND DTdate >= ? AND DTdate <= ?");
+        $stm->execute([$this->idUser, $lastIncomeDateSQL, $lastIncomeDatePlusMonthSQL]);
+        $result = $stm->fetchAll();
 
-        $stm = $this->conn->prepare("SELECT SUM(DTamount) AS totalDaily FROM dailyTransactions WHERE Users_idUser = ?");
-        $stm->execute([$this->idUser]);
-        $result = $stm->fetch(); 
-        $result['totalDaily'] ?? 0; 
-
-        return $result['totalDaily'] - $totalCatAm;
+        foreach($result as $value){
+            if(!in_array($value['DTname'], array_column($categories, 'categories'))){
+                $totalDailyActual += $value['DTamount'];
+            }else{
+                $totalDailyActual += 0;
+            }
+        }    
+        
+        foreach($categories as $category){
+            $categoryName = $category['categories'];
+            $categoryAmount = $category['amount'];
+            $stm = $this->conn->prepare(
+                "SELECT SUM(DTamount) AS totalDaily FROM dailyTransactions 
+                WHERE Users_idUser = ? AND DTdate >= ? AND DTdate <= ? AND DTname = ?"
+            );
+            $stm->execute([$this->idUser, $lastIncomeDateSQL, $lastIncomeDatePlusMonthSQL, $categoryName]);
+            $result = $stm->fetch();
+            $result['totalDaily'] ?? 0;
+    
+            if($categoryAmount < abs($result['totalDaily'])){
+                $categoriesExcess += abs($result['totalDaily']) - $categoryAmount;
+            }
+        }
+            
+        return  $totalDailyActual - $categoriesExcess;
     }
+    
 
     public function totalCharge(){
         $stm = $this->conn->prepare("SELECT SUM(chargeAmount) AS totalCharge FROM charges WHERE Users_idUser = ?");
@@ -142,13 +178,15 @@ class TotalConfig{
         $stm->execute([$this->userTotal, $this->idUser]);
     }
 
-    public function calculateDaily() { //do naprawy
+    public function calculateDaily() { // dobrze liczy
         $getDate = new IncomeConfig();
         $getDate->setUsers_idUser($this->idUser);
         $lastIncome = $getDate->fetchLastIncome();
         if (empty($lastIncome) || !isset($lastIncome[0]['incomeDate'])) {
             return $dailyBudget = 0;
         }
+        
+
         
         $totalToUse = $lastIncome[0]['incomeAmount'] - $this->totalCharge() - $this->totalBudget();
     
@@ -166,7 +204,7 @@ class TotalConfig{
         return $dailyBudget;  //
     }
 
-    public function calculateDailyActuall(){
+    public function calculateDailyActuall(){ 
         $getDate = new IncomeConfig();
         $getDate->setUsers_idUser($this->idUser);
         $lastIncome = $getDate->fetchLastIncome();
@@ -180,15 +218,17 @@ class TotalConfig{
 
         if($lastIncomeDate > $today){
             $today = $lastIncomeDate;
-            $diff = abs(strtotime($today) - strtotime($lastIncomeDate)+1);
+            $diff = ceil((strtotime($today) - strtotime($lastIncomeDate)+1)/86400);
         }else{
-            $diff = abs(strtotime($today) - strtotime($lastIncomeDate)+1);
+            $diff = ceil((strtotime($today) - strtotime($lastIncomeDate)+1)/86400);
         }
 
         
         $actuallDaily = ($this->calculateDaily()) * $diff; //oddaje policzoną wartość kwoty z wypłaty - budzet - wydatki
 
-        $actuallDaily +=  $this->totalDailyWithoutCategories(); //dodaje do tej kwoty wszystkie wydatki z dnia, chyba, że to kategorie (czyli budzet, opłaty stałe itp) bo one byly wliczone wczesniej
+        $totalDailyWithoutCategories = $this->totalDailyWithoutCategories();
+
+        $actuallDaily +=  $totalDailyWithoutCategories; //dodaje do tej kwoty wszystkie wydatki z dnia, chyba, że to kategorie (czyli budzet, opłaty stałe itp) bo one byly wliczone wczesniej
 
         return $actuallDaily;
     }
