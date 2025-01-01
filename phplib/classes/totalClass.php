@@ -201,7 +201,7 @@ class TotalConfig{
         
         $this->setDailyBudget($dailyBudget);
 
-        return $dailyBudget;  //
+        return floor($dailyBudget);  //
     }
 
     public function calculateDailyActuall(){ 

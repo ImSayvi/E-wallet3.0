@@ -15,7 +15,9 @@ if (isset($_POST['save_daily'])) {
     $daily->setDTamount($_POST['amountInput']);
     $daily->setDTdate($_POST['dailyDate']);
 
-    $category = ($_POST['dailyCategory'] === 'other') ? $_POST['otherCategory'] : $_POST['dailyCategory']; 
+    $category = isset($_POST['dailyCategory']) ? $_POST['dailyCategory'] : $_POST['otherCategory']; 
+    var_dump($category);
+    var_dump($_POST);
     $daily->setDTname($category);
 
     $daily->insertDaily();
