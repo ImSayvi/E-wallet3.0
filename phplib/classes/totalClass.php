@@ -64,8 +64,19 @@ class TotalConfig{
     // }
     
     public function totalDaily(){
-        $stm = $this->conn->prepare("SELECT SUM(DTamount) AS totalDaily FROM dailyTransactions WHERE Users_idUser = ?");
-        $stm->execute([$this->idUser]);
+        $lastIncome = new IncomeConfig();
+        $lastIncome->setUsers_idUser($this->idUser);
+        $lastIncomeData = $lastIncome->fetchLastIncome();
+    
+        $lastIncomeDate = $lastIncomeData[0]['incomeDate'] ?? date('Y-m-d');
+        $lastIncomeDateFormated = strtotime($lastIncomeDate);
+        $lastIncomeDatePlusMonth = strtotime('+1 month', $lastIncomeDateFormated);
+    
+        $lastIncomeDateSQL = date('Y-m-d', $lastIncomeDateFormated);
+        $lastIncomeDatePlusMonthSQL = date('Y-m-d', $lastIncomeDatePlusMonth);
+
+        $stm = $this->conn->prepare("SELECT SUM(DTamount) AS totalDaily FROM dailyTransactions WHERE Users_idUser = ? AND DTdate >= ? AND DTdate < ?");
+        $stm->execute([$this->idUser, $lastIncomeDateSQL, $lastIncomeDatePlusMonthSQL]);
         $result = $stm->fetch(); 
         $result['totalDaily'] ?? 0; 
 

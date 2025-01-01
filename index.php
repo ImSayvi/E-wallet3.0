@@ -156,7 +156,7 @@ $dzienne->setIdUser($_SESSION['idUser']);
                                             </thead>
                                             <tfoot>
                                                 <tr>
-                                                    <th colspan="4">Łącznie:</th>
+                                                    <th colspan="4">Łącznie: <?php echo $daily->getAllNegativeDailySum(); ?></th>
                                                 </tr>
                                             </tfoot>
                                             <tbody>
@@ -204,7 +204,7 @@ $dzienne->setIdUser($_SESSION['idUser']);
                                             </thead>
                                             <tfoot>
                                                 <tr>
-                                                    <th colspan="4">Łącznie:</th>
+                                                    <th colspan="4"> Łącznie: <?php echo $daily->getAllPositiveDailySum(); ?></th>
                                                 </tr>
                                             </tfoot>
                                             <tbody>
