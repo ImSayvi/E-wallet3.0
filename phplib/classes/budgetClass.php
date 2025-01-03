@@ -122,6 +122,81 @@ class BudgetConfig{
 
         return $result;
     }
+
+    public function insertIntoBudgetHistory() {
+        try {
+            $stm = $this->conn->prepare("SELECT idBudget, budgetCategory FROM budget WHERE Users_idUser = ?");
+            $stm->execute([$this->Users_idUser]);
+            $categories = $stm->fetchAll();
+    
+            $daily = new DailyConfig();
+            $daily->setUsers_idUser($this->Users_idUser);
+            $dailyOutcome = $daily->getAllNegativeDaily(); //getallnegativedaily zapewnia nam, że dane są tylko z miesięcznych wydatków, czyli źle, bo nie będzie nam sumowało poprawnie budżetów zapisywanych gdzie indziej (też tylko w skali mieisąca)
+    
+            $inserted = false;
+    
+            foreach ($dailyOutcome as $value) {
+                foreach ($categories as $category) {
+                    if ($value['DTname'] == $category['budgetCategory']) {
+                        // Sprawdź, czy rekord już istnieje
+                        $stm = $this->conn->prepare("
+                            SELECT COUNT(*) FROM budgethistory 
+                            WHERE Users_idUser = ? AND Budget_idBudget = ? AND BHdate = ? AND BHamount = ?
+                        ");
+                        $stm->execute([
+                            $this->Users_idUser,
+                            $category['idBudget'],
+                            $value['DTdate'],
+                            $value['DTamount']
+                        ]);
+    
+                        $exists = $stm->fetchColumn();
+    
+                        if (!$exists) {
+                            $stm = $this->conn->prepare("
+                                INSERT INTO budgethistory (Users_idUser, Budget_idBudget, BHdate, BHamount, idBudgetHistory) 
+                                VALUES (?, ?, ?, ?, ?)
+                            ");
+                            $stm->execute([
+                                $this->Users_idUser,
+                                $category['idBudget'],
+                                $value['DTdate'],
+                                $value['DTamount'],
+                                '0'
+                            ]);
+                            $inserted = true;
+                        }
+                    }
+                }
+            }
+    
+            return $inserted; 
+        } catch (PDOException $e) {
+            error_log("Database error in insertIntoBudgetHistory: " . $e->getMessage());
+            echo "Wystąpił błąd podczas wstawiania do historii budżetu.";
+            return false;
+        }
+    }
+    
+    
+
+    public function fetchBudgetHistory($idBudget){
+        try{
+            $stm = $this->conn->prepare("SELECT * FROM budgethistory WHERE Users_idUser = ? AND Budget_idBudget = ?");
+            $stm->execute([$this->Users_idUser, $idBudget]);
+            $result = $stm->fetchAll();
+
+            return $result;
+        }
+        catch(PDOException $e){
+            echo $e->getMessage();
+        }
+     
+    }
+
+    public function getBudgetPercent($idBudget){
+
+    }
 }
 
 ?>

@@ -120,6 +120,29 @@ class IncomeConfig{
         }
     }
 
+    public function lastIncomeDateAndPlusMonth(){
+        try{
+            $stm = $this->conn->prepare('SELECT incomeDate FROM income WHERE Users_idUser = ? ORDER BY incomeDate DESC LIMIT 1');
+            $stm->execute([$this->Users_idUser]);
+            $result = $stm->fetch();
+            $lastIncomeDate = $result['incomeDate'] ?? date('Y-m-d');
+           
+            $lastIncomeDateFormated = strtotime($lastIncomeDate);
+            $lastIncomeDatePlusMonth = strtotime('+1 month', $lastIncomeDateFormated);
+        
+            $lastIncomeDateSQL = date('Y-m-d', $lastIncomeDateFormated);
+            $lastIncomeDatePlusMonthSQL = date('Y-m-d', $lastIncomeDatePlusMonth);
+
+            $lastIncomeDates = array($lastIncomeDateSQL, $lastIncomeDatePlusMonthSQL);
+
+            return $lastIncomeDates;
+        }
+        catch(Exception $e){
+            return $e->getMessage();
+        }
+ 
+    }
+
     // public function updateIncome(){
     //     try{
     //         $stm = $this->conn->prepare('UPDATE income SET incomeAmount = ?, incomeDate = ?, incomeName = ? WHERE idIncome = ?');

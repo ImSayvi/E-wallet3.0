@@ -10,12 +10,16 @@ $daily->setUsers_idUser($_SESSION['idUser']);
 $budget = new BudgetConfig();
 $budget->setUsers_idUser($_SESSION['idUser']);
 
+$budget->insertIntoBudgetHistory();
+
+
+
 // dodawanie wydatków
 if (isset($_POST['save_daily'])) {
     $daily->setDTamount($_POST['amountInput']);
     $daily->setDTdate($_POST['dailyDate']);
 
-    $category = isset($_POST['dailyCategory']) ? $_POST['dailyCategory'] : $_POST['otherCategory']; 
+    $category = (isset($_POST['dailyCategory']) && $_POST['dailyCategory'] != 'other') ? $_POST['dailyCategory'] : $_POST['otherCategory']; 
     var_dump($category);
     var_dump($_POST);
     $daily->setDTname($category);
@@ -24,7 +28,8 @@ if (isset($_POST['save_daily'])) {
 
     $budget->setBudgetCategory($category);
     $budget->setBudgetAmount($_POST['amountInput']);
-    $budget->putIntoBudgetHistory();
+    
+    
 }
 
 //pobranie wydatkow i wplywow
@@ -147,7 +152,7 @@ $dzienne->setIdUser($_SESSION['idUser']);
                                 <div class="card-body">
                                     
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">
+                                        <table class="table table-bordered table-striped table-hover" id="dataTable" width="100%" cellspacing="0">
                                             <thead class="bg-danger text-white">
                                                 <tr>
                                                     <th>Kwota</th>
@@ -195,7 +200,7 @@ $dzienne->setIdUser($_SESSION['idUser']);
                                 <div class="card-body">
                                     
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">
+                                        <table class="table table-bordered table-striped table-hover" id="dataTable" width="100%" cellspacing="0">
                                             <thead class="bg-success text-white">
                                                 <tr>
                                                     <th>Kwota</th>

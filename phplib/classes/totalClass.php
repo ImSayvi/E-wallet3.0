@@ -80,6 +80,7 @@ class TotalConfig{
         $result = $stm->fetch(); 
         $result['totalDaily'] ?? 0; 
 
+
         return $result['totalDaily'];
     }
 
@@ -143,7 +144,8 @@ class TotalConfig{
                 $categoriesExcess += abs($result['totalDaily']) - $categoryAmount;
             }
         }
-            
+
+        
         return  $totalDailyActual - $categoriesExcess;
     }
     

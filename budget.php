@@ -45,7 +45,7 @@ if (isset($_POST['edit_budget']) && isset($_GET['req']) && $_GET['req'] == 'edit
 
                     <!-- Page Heading -->
                     <h1 class="h3 mb-2 text-gray-800">BUDŻET</h1>
-                    <p class="mb-4">Tutaj znajdują się pieniądze, które chcesz przeznaczyć na jakiś cel. Nie są obowiązkowe, nie musisz wydać całej kwoty.</p>
+                    <p class="mb-4">Tutaj znajdują się pieniądze, które chcesz przeznaczyć na jakiś cel. Nie są obowiązkowe, nie musisz wydać całej kwoty. Budżet znajdujący się na koncie głównym resetuje się co miesiąc (z dniem wprowadzenia nowej wypłaty). Budżet na koncie oszczędnościowym zostaje uwzględniony w kwocie oszczędności, ale jest podliczany z całego okresu. Budżet przechowywany "gdzie indziej" nie jest nigdzie uwzględniony.</p>
 
                     <div class="container-fluid">
                         <!-- Page Heading -->
@@ -57,16 +57,16 @@ if (isset($_POST['edit_budget']) && isset($_GET['req']) && $_GET['req'] == 'edit
                     
                         <div class="row">
                            
-                             <?php foreach($allBudgets as $budget): ?>
+                             <?php foreach($allBudgets as $budgets): ?>
                                 <div class="col-xl-3 col-md-6 mb-4">
                                     <div class="card border-left-info shadow">
                                         <div class="card-body">
-                                            <div class="row no-gutters align-items-center" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample" href="#collapseBudget<?= $budget['idBudget'] ?>">
+                                            <div class="row no-gutters align-items-center" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample" href="#collapseBudget<?= $budgets['idBudget'] ?>">
                                                 <div class="col mr-2">
-                                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1"><?= $budget['budgetCategory'] ?></div>
+                                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1"><?= $budgets['budgetCategory'] ?></div>
                                                     <div class="row no-gutters align-items-center">
                                                         <div class="col-auto">
-                                                            <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800"><?= $budget['budgetAmount'] ?> zł</div>
+                                                            <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800"><?= $budgets['budgetAmount'] ?> zł</div>
                                                         </div>
                                                         <div class="col">
                                                             <div class="progress progress-sm mr-2">
@@ -80,16 +80,16 @@ if (isset($_POST['edit_budget']) && isset($_GET['req']) && $_GET['req'] == 'edit
                                                 </div>
                                             </div>
                                             <!-- collapsable content -->
-                                            <div class="collapse" id="collapseBudget<?= $budget['idBudget'] ?>">
+                                            <div class="collapse" id="collapseBudget<?= $budgets['idBudget'] ?>">
                                                 <div class="card-body">
                                                  
                                                     <div class="button-container d-flex justify-content-center">
                                                         <!-- <button type="button" class="btn btn-primary btn-sm mb-1 mr-2" id="addBudgetBtn" data-toggle="modal" data-target="#addBudgetModal">
                                                             Edytuj <i class="fa-regular fa-pen-to-square"></i>
                                                         </button> -->
-                                                        <a href="budget.php?idBudget=<?= $budget['idBudget']?>&req=edit" 
+                                                        <a href="budget.php?idBudget=<?= $budgets['idBudget']?>&req=edit" 
                                                             class="btn btn-primary btn-sm mb-1 mr-2" 
-                                                            data-target="#editBudget<?= $budget['idBudget']?>"
+                                                            data-target="#editBudget<?= $budgets['idBudget']?>"
                                                             data-toggle = "modal"
                                                             >Edytuj
                                                             <i class="fa-regular fa-pen-to-square"></i>
@@ -97,7 +97,7 @@ if (isset($_POST['edit_budget']) && isset($_GET['req']) && $_GET['req'] == 'edit
                                                             
 
 
-                                                        <a href="budget.php?idBudget=<?= $budget['idBudget'] ?>&req=delete" 
+                                                        <a href="budget.php?idBudget=<?= $budgets['idBudget'] ?>&req=delete" 
                                                         class="btn btn-danger btn-sm mb-1">Usuń
                                                         <i class="fas fa-trash"></i>
                                                         </a>
@@ -106,7 +106,7 @@ if (isset($_POST['edit_budget']) && isset($_GET['req']) && $_GET['req'] == 'edit
                                                     
                                                     <h6>
                                                         <div class="text-center">
-                                                            <span class="badge badge-secondary text-wrap"><?= $budget['budgetWhere'] ?></span>
+                                                            <span class="badge badge-secondary text-wrap"><?= $budgets['budgetWhere'] ?></span>
                                                         </div>
                                                     </h6>
                                                       
@@ -119,18 +119,13 @@ if (isset($_POST['edit_budget']) && isset($_GET['req']) && $_GET['req'] == 'edit
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                <tr>
-                                                                    <td>Mark</td>
-                                                                    <td>Otto</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>Thornton</td>
-                                                                    <td>@fat</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>the Bird</td>
-                                                                    <td>@twitter</td>
-                                                                </tr>
+                                                            <?php foreach($budget->fetchBudgetHistory($budgets['idBudget']) as $history): ?>
+                                                                    <tr>
+                                                                        <td><?= $history['BHamount'] ?> zł</td>
+                                                                        <td><?= $history['BHdate'] ?></td>
+                                                                    </tr>
+                                                               
+                                                                <?php endforeach ?>
                                                             </tbody>
                                                         </table>
                                                     </div>
@@ -141,7 +136,7 @@ if (isset($_POST['edit_budget']) && isset($_GET['req']) && $_GET['req'] == 'edit
                                 </div>
                                 <?php 
                                     $editModal = new ModalCreator();
-                                    echo $editModal->createEditBudgetModal($budget['idBudget'], $budget['budgetCategory'], $budget['budgetAmount'], $budget['budgetWhere']);
+                                    echo $editModal->createEditBudgetModal($budgets['idBudget'], $budgets['budgetCategory'], $budgets['budgetAmount'], $budgets['budgetWhere']);
                                 ?>
                             <?php endforeach ?>
                         </div>
