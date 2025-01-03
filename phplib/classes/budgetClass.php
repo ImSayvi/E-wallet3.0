@@ -125,7 +125,7 @@ class BudgetConfig{
 
     public function insertIntoBudgetHistory() {
         try {
-            $stm = $this->conn->prepare("SELECT idBudget, budgetCategory FROM budget WHERE Users_idUser = ?");
+            $stm = $this->conn->prepare("SELECT idBudget, budgetCategory, budgetWhere FROM budget WHERE Users_idUser = ?");
             $stm->execute([$this->Users_idUser]);
             $categories = $stm->fetchAll();
     
@@ -137,34 +137,33 @@ class BudgetConfig{
     
             foreach ($dailyOutcome as $value) {
                 foreach ($categories as $category) {
-                    if ($value['DTname'] == $category['budgetCategory']) {
+                    if($category['budgetWhere'] == 'Na koncie głównym' && $value['DTname'] == $category['budgetCategory']){
                         // Sprawdź, czy rekord już istnieje
-                        $stm = $this->conn->prepare("
-                            SELECT COUNT(*) FROM budgethistory 
-                            WHERE Users_idUser = ? AND Budget_idBudget = ? AND BHdate = ? AND BHamount = ?
-                        ");
-                        $stm->execute([
-                            $this->Users_idUser,
-                            $category['idBudget'],
-                            $value['DTdate'],
-                            $value['DTamount']
-                        ]);
-    
+                        $stm = $this->conn->prepare("SELECT COUNT(*) FROM budgethistory WHERE Users_idUser = ? AND Budget_idBudget = ? AND BHdate = ? AND BHamount = ?");
+                        $stm->execute([$this->Users_idUser, $category['idBudget'], $value['DTdate'], $value['DTamount']]);
                         $exists = $stm->fetchColumn();
     
                         if (!$exists) {
-                            $stm = $this->conn->prepare("
-                                INSERT INTO budgethistory (Users_idUser, Budget_idBudget, BHdate, BHamount, idBudgetHistory) 
-                                VALUES (?, ?, ?, ?, ?)
-                            ");
-                            $stm->execute([
-                                $this->Users_idUser,
-                                $category['idBudget'],
-                                $value['DTdate'],
-                                $value['DTamount'],
-                                '0'
-                            ]);
+                            $stm = $this->conn->prepare("INSERT INTO budgethistory (Users_idUser, Budget_idBudget, BHdate, BHamount, idBudgetHistory) VALUES (?, ?, ?, ?, ?)");
+                            $stm->execute([$this->Users_idUser, $category['idBudget'], $value['DTdate'], $value['DTamount'], '0']);
                             $inserted = true;
+                        }
+                    }else{
+                        $stm = $this->conn->prepare("select * from dailytransactions where Users_idUser = ?");
+                        $stm->execute([$this->Users_idUser]);
+                        $result = $stm->fetchAll();
+                        foreach($result as $value){
+                            if($value['DTname'] == $category['budgetCategory']){
+                                $stm = $this->conn->prepare("SELECT COUNT(*) FROM budgethistory WHERE Users_idUser = ? AND Budget_idBudget = ? AND BHdate = ? AND BHamount = ?");
+                                $stm->execute([$this->Users_idUser, $category['idBudget'], $value['DTdate'], $value['DTamount']]);
+                                $exists = $stm->fetchColumn();
+    
+                                if (!$exists) {
+                                    $stm = $this->conn->prepare("INSERT INTO budgethistory (Users_idUser, Budget_idBudget, BHdate, BHamount, idBudgetHistory) VALUES (?, ?, ?, ?, ?)");
+                                    $stm->execute([$this->Users_idUser, $category['idBudget'], $value['DTdate'], $value['DTamount'], '0']);
+                                    $inserted = true;
+                                }
+                            }
                         }
                     }
                 }
