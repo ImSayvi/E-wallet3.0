@@ -181,6 +181,7 @@ class BudgetConfig{
     
     public function fetchBudgetHistory($idBudget) {
         try {
+
             $stm = $this->conn->prepare("
                 SELECT 
                     b.budgetCategory, 
@@ -195,39 +196,57 @@ class BudgetConfig{
                 ON 
                     bh.budget_idbudget = b.idBudget 
                 WHERE 
-                    b.Users_idUser = ?  -- Specify the table for Users_idUser
-                    AND bh.Budget_idBudget = ? -- Specify the table for Budget_idBudget
+                    b.Users_idUser = ? 
+                    AND bh.Budget_idBudget = ?
             ");
             $stm->execute([$this->Users_idUser, $idBudget]);
             $result = $stm->fetchAll();
     
             if (!$result) {
-                return []; 
+                return [];
             }
-    
+
             $incomeDates = new IncomeConfig();
             $incomeDates->setUsers_idUser($this->Users_idUser);
             $lastIncomeData = $incomeDates->lastIncomeDateAndPlusMonth();
     
-          
-            $filteredResult = array_filter($result, function ($row) use ($lastIncomeData) {
-                if ($row['budgetWhere'] === 'Na koncie głównym') {
-                    return $row['BHdate'] >= $lastIncomeData[0] && $row['BHdate'] <= $lastIncomeData[1];
+            // Filtrowanie wyników bez użycia array_filter
+            $filteredResult = [];
+            foreach ($result as $row) {
+                
+                if ($row['budgetWhere'] === 'Na koncie głównym') { // Jeśli 'budgetWhere' = "Na koncie głównym", sprawdzamy zakres dat
+                    if ($row['BHdate'] >= $lastIncomeData[0] && $row['BHdate'] <= $lastIncomeData[1]) {
+                        $filteredResult[] = $row; // Dodajemy do wyników
+                    }
+                } else {
+                    // Jeśli 'budgetWhere' nie jest "Na koncie głównym", dodajemy bez sprawdzania dat
+                    $filteredResult[] = $row;
                 }
-                return true;
-            });
+            }
     
-            return array_values($filteredResult);
+            return $filteredResult;
         } catch (PDOException $e) {
-            error_log($e->getMessage()); 
-            return []; 
+            error_log($e->getMessage());
+            return [];
         }
     }
     
     
 
-    public function getBudgetPercent($idBudget){
+    public function getBudgetTotal($idBudget){
+        $array = $this->fetchBudgetHistory($idBudget);
+        $amountArray = array_column($array, 'BHamount');
+        $sum = array_sum($amountArray);
 
+        return (float)$sum;
+    }
+
+    public function countPercent($total, $actuall){
+        if($total == 0){
+            return 0;
+        }else{
+            return 100 - round(($actuall / $total) * 100, 2);
+        }
     }
 }
 

@@ -66,11 +66,11 @@ if (isset($_POST['edit_budget']) && isset($_GET['req']) && $_GET['req'] == 'edit
                                                     <div class="text-xs font-weight-bold text-info text-uppercase mb-1"><?= $budgets['budgetCategory'] ?><span class="float-right"><?= $budgets['budgetAmount'] ?> zł</span></div>
                                                     <div class="row no-gutters align-items-center">
                                                         <div class="col-auto">
-                                                            <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800"><?= $budgets['budgetAmount'] ?> zł</div>
+                                                            <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800"><?= $budgets['budgetAmount'] + $budget->getBudgetTotal($budgets['idBudget']) ?> zł</div>
                                                         </div>
                                                         <div class="col">
                                                             <div class="progress progress-sm mr-2">
-                                                                <div class="progress-bar bg-info" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                <div class="progress-bar bg-info" role="progressbar" style="width: <?= $budget->countPercent($budgets['budgetAmount'], abs($budget->getBudgetTotal($budgets['idBudget']))) ?>%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
                                                             </div>
                                                         </div>
                                                     </div>
