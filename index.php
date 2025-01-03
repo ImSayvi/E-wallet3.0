@@ -14,6 +14,7 @@ $budget->insertIntoBudgetHistory();
 
 
 
+
 // dodawanie wydatków
 if (isset($_POST['save_daily'])) {
     $daily->setDTamount($_POST['amountInput']);

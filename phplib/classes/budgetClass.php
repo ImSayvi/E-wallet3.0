@@ -125,45 +125,46 @@ class BudgetConfig{
 
     public function insertIntoBudgetHistory() {
         try {
-            $stm = $this->conn->prepare("SELECT idBudget, budgetCategory, budgetWhere FROM budget WHERE Users_idUser = ?");
+            $stm = $this->conn->prepare("SELECT idBudget, budgetCategory FROM budget WHERE Users_idUser = ?");
             $stm->execute([$this->Users_idUser]);
             $categories = $stm->fetchAll();
     
-            $daily = new DailyConfig();
-            $daily->setUsers_idUser($this->Users_idUser);
-            $dailyOutcome = $daily->getAllNegativeDaily(); //getallnegativedaily zapewnia nam, że dane są tylko z miesięcznych wydatków, czyli źle, bo nie będzie nam sumowało poprawnie budżetów zapisywanych gdzie indziej (też tylko w skali mieisąca)
+            $stm = $this->conn->prepare("SELECT * FROM dailytransactions WHERE Users_idUser = ?");
+            $stm->execute([$this->Users_idUser]);
+            $dailyOutcome = $stm->fetchAll(); 
     
             $inserted = false;
     
             foreach ($dailyOutcome as $value) {
                 foreach ($categories as $category) {
-                    if($category['budgetWhere'] == 'Na koncie głównym' && $value['DTname'] == $category['budgetCategory']){
+                    if ($value['DTname'] == $category['budgetCategory']) {
                         // Sprawdź, czy rekord już istnieje
-                        $stm = $this->conn->prepare("SELECT COUNT(*) FROM budgethistory WHERE Users_idUser = ? AND Budget_idBudget = ? AND BHdate = ? AND BHamount = ?");
-                        $stm->execute([$this->Users_idUser, $category['idBudget'], $value['DTdate'], $value['DTamount']]);
+                        $stm = $this->conn->prepare("
+                            SELECT COUNT(*) FROM budgethistory 
+                            WHERE Users_idUser = ? AND Budget_idBudget = ? AND BHdate = ? AND BHamount = ?
+                        ");
+                        $stm->execute([
+                            $this->Users_idUser,
+                            $category['idBudget'],
+                            $value['DTdate'],
+                            $value['DTamount']
+                        ]);
+    
                         $exists = $stm->fetchColumn();
     
                         if (!$exists) {
-                            $stm = $this->conn->prepare("INSERT INTO budgethistory (Users_idUser, Budget_idBudget, BHdate, BHamount, idBudgetHistory) VALUES (?, ?, ?, ?, ?)");
-                            $stm->execute([$this->Users_idUser, $category['idBudget'], $value['DTdate'], $value['DTamount'], '0']);
+                            $stm = $this->conn->prepare("
+                                INSERT INTO budgethistory (Users_idUser, Budget_idBudget, BHdate, BHamount, idBudgetHistory) 
+                                VALUES (?, ?, ?, ?, ?)
+                            ");
+                            $stm->execute([
+                                $this->Users_idUser,
+                                $category['idBudget'],
+                                $value['DTdate'],
+                                $value['DTamount'],
+                                '0'
+                            ]);
                             $inserted = true;
-                        }
-                    }else{
-                        $stm = $this->conn->prepare("select * from dailytransactions where Users_idUser = ?");
-                        $stm->execute([$this->Users_idUser]);
-                        $result = $stm->fetchAll();
-                        foreach($result as $value){
-                            if($value['DTname'] == $category['budgetCategory']){
-                                $stm = $this->conn->prepare("SELECT COUNT(*) FROM budgethistory WHERE Users_idUser = ? AND Budget_idBudget = ? AND BHdate = ? AND BHamount = ?");
-                                $stm->execute([$this->Users_idUser, $category['idBudget'], $value['DTdate'], $value['DTamount']]);
-                                $exists = $stm->fetchColumn();
-    
-                                if (!$exists) {
-                                    $stm = $this->conn->prepare("INSERT INTO budgethistory (Users_idUser, Budget_idBudget, BHdate, BHamount, idBudgetHistory) VALUES (?, ?, ?, ?, ?)");
-                                    $stm->execute([$this->Users_idUser, $category['idBudget'], $value['DTdate'], $value['DTamount'], '0']);
-                                    $inserted = true;
-                                }
-                            }
                         }
                     }
                 }
@@ -178,20 +179,52 @@ class BudgetConfig{
     }
     
     
-
-    public function fetchBudgetHistory($idBudget){
-        try{
-            $stm = $this->conn->prepare("SELECT * FROM budgethistory WHERE Users_idUser = ? AND Budget_idBudget = ?");
+    public function fetchBudgetHistory($idBudget) {
+        try {
+            $stm = $this->conn->prepare("
+                SELECT 
+                    b.budgetCategory, 
+                    b.budgetWhere, 
+                    bh.BHamount, 
+                    bh.idBudgetHistory, 
+                    bh.BHdate 
+                FROM 
+                    budgethistory bh 
+                JOIN 
+                    budget b 
+                ON 
+                    bh.budget_idbudget = b.idBudget 
+                WHERE 
+                    b.Users_idUser = ?  -- Specify the table for Users_idUser
+                    AND bh.Budget_idBudget = ? -- Specify the table for Budget_idBudget
+            ");
             $stm->execute([$this->Users_idUser, $idBudget]);
             $result = $stm->fetchAll();
-
-            return $result;
+    
+            if (!$result) {
+                return []; 
+            }
+    
+            $incomeDates = new IncomeConfig();
+            $incomeDates->setUsers_idUser($this->Users_idUser);
+            $lastIncomeData = $incomeDates->lastIncomeDateAndPlusMonth();
+    
+          
+            $filteredResult = array_filter($result, function ($row) use ($lastIncomeData) {
+                if ($row['budgetWhere'] === 'Na koncie głównym') {
+                    return $row['BHdate'] >= $lastIncomeData[0] && $row['BHdate'] <= $lastIncomeData[1];
+                }
+                return true;
+            });
+    
+            return array_values($filteredResult);
+        } catch (PDOException $e) {
+            error_log($e->getMessage()); 
+            return []; 
         }
-        catch(PDOException $e){
-            echo $e->getMessage();
-        }
-     
     }
+    
+    
 
     public function getBudgetPercent($idBudget){
 

@@ -63,7 +63,7 @@ if (isset($_POST['edit_budget']) && isset($_GET['req']) && $_GET['req'] == 'edit
                                         <div class="card-body">
                                             <div class="row no-gutters align-items-center" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample" href="#collapseBudget<?= $budgets['idBudget'] ?>">
                                                 <div class="col mr-2">
-                                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1"><?= $budgets['budgetCategory'] ?></div>
+                                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1"><?= $budgets['budgetCategory'] ?><span class="float-right"><?= $budgets['budgetAmount'] ?> zł</span></div>
                                                     <div class="row no-gutters align-items-center">
                                                         <div class="col-auto">
                                                             <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800"><?= $budgets['budgetAmount'] ?> zł</div>
@@ -119,13 +119,19 @@ if (isset($_POST['edit_budget']) && isset($_GET['req']) && $_GET['req'] == 'edit
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                            <?php foreach($budget->fetchBudgetHistory($budgets['idBudget']) as $history): ?>
-                                                                    <tr>
-                                                                        <td><?= $history['BHamount'] ?> zł</td>
-                                                                        <td><?= $history['BHdate'] ?></td>
-                                                                    </tr>
-                                                               
-                                                                <?php endforeach ?>
+                                                            <?php 
+                                                                $budgetHistory = $budget->fetchBudgetHistory($budgets['idBudget']);
+                                                                if (!empty($budgetHistory)) {
+                                                                    foreach ($budgetHistory as $history): ?>
+                                                                        <tr>
+                                                                            <td><?= $history['BHamount'] ?> zł</td>
+                                                                            <td><?= $history['BHdate'] ?></td>
+                                                                        </tr>
+                                                                    <?php endforeach;
+                                                                } else {
+                                                                    echo "<tr><td colspan='2'>Brak historii</td></tr>";
+                                                                }
+                                                                ?>
                                                             </tbody>
                                                         </table>
                                                     </div>
