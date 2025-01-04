@@ -146,6 +146,30 @@ class ChargeConfig{
         }
     }
 
+    public function fetchSum($idCharge){
+        try{
+            $stm = $this->conn->prepare('SELECT sum(dt.DTamount) as sum from dailytransactions dt join charges ch on dt.DTname = ch.chargeCategory where ch.idCharge = ? and dt.Users_idUser = ?');
+            $stm->execute([$idCharge, $this->Users_idUser]);
+            $sum = $stm->fetch();
+            return abs($sum['sum']) ?? 0;
+        }
+        catch(PDOException $e){
+            echo $e->getMessage();
+        }
+    }
+
+    public function fetchDate($idCharge){
+        try{
+            $stm = $this->conn->prepare('SELECT dt.DTdate from dailytransactions dt join charges ch on dt.DTname = ch.chargeCategory where ch.idCharge = ? and dt.Users_idUser = ? order by dt.DTdate desc limit 1');
+            $stm->execute([$idCharge, $this->Users_idUser]);
+            $date = $stm->fetch();
+            return $date['DTdate'] ?? 'Nie wpłacono';
+        }
+        catch(PDOException $e){
+            echo $e->getMessage();
+        }
+    }
+
 }
 
 ?>

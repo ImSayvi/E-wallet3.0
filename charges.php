@@ -3,7 +3,7 @@
 
 $charge = new ChargeConfig();
 $charge->setUsers_idUser($_SESSION['idUser']);
-var_dump($_SESSION['idUser']);
+
 
 // inserting charge
 if(isset($_POST['save_charge'])){
@@ -128,26 +128,26 @@ if (isset($_POST['edit_charge']) && isset($_GET['req']) && $_GET['req'] == 'edit
                             </thead>
                             <tbody>
 
-                            <?php foreach ($allChargesBydate as $charge): ?>
+                            <?php foreach ($allChargesBydate as $charges): ?>
                                 <tr>
-                                    <td><?= $charge['chargeCategory'] ?></td>
-                                    <td><?= $charge['chargeAmount'] ?></td>
-                                    <td>100</td>
-                                    <td>20.11.2024</td>
+                                    <td><?= $charges['chargeCategory'] ?></td>
+                                    <td><?= $charges['chargeAmount'] ?></td>
+                                    <td><?= $charge->fetchSum($charges['idCharge']) ?></td>
+                                    <td><?= $charge->fetchDate($charges['idCharge']) ?></td>
                                     <td class="text-center">
-                                    <a href="charges.php?idCharge=<?= $charge['idCharge']?>&req=edit" 
+                                    <a href="charges.php?idCharge=<?= $charges['idCharge']?>&req=edit" 
                                         class="btn btn-warning btn-circle btn-sm edit-charge-btn" 
-                                        data-target="#editCharge<?= $charge['idCharge']?>"
+                                        data-target="#editCharge<?= $charges['idCharge']?>"
                                         data-toggle = "modal"
                                         >
                                         <i class="fa-regular fa-pen-to-square"></i>
                                     </a>
                                            <?php 
                                            $editModal = new ModalCreator();
-                                           echo $editModal->createEditChargesModal($charge['idCharge'], $charge['chargeAmount'], $charge['chargeCategory'], $charge['chargeExpiryDate']);
+                                           echo $editModal->createEditChargesModal($charges['idCharge'], $charges['chargeAmount'], $charges['chargeCategory'], $charges['chargeExpiryDate']);
                                            ?>
                                         
-                                        <a href="charges.php?idCharge=<?= $charge['idCharge'] ?>&req=delete" 
+                                        <a href="charges.php?idCharge=<?= $charges['idCharge'] ?>&req=delete" 
                                            class="btn btn-danger btn-circle btn-sm">
                                            <i class="fas fa-trash"></i>
                                         </a>
