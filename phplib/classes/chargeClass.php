@@ -89,7 +89,7 @@ class ChargeConfig{
 
     public function fetchAllChargesByDate(){
         try{
-            $stm = $this->conn->prepare('SELECT * FROM charges WHERE Users_idUser = ? AND chargeExpiryDate >= ?  OR chargeExpiryDate = "0000-00-00" OR chargeExpiryDate = "NULL" ORDER BY chargeAddDate DESC');
+            $stm = $this->conn->prepare('SELECT * FROM charges WHERE Users_idUser = ? AND (chargeExpiryDate >= ?  OR chargeExpiryDate = "0000-00-00" OR chargeExpiryDate = "NULL") ORDER BY chargeAddDate DESC');
             $stm->execute([$this->Users_idUser, date('Y-m-d')]);
             return $stm->fetchAll();
         }
@@ -100,7 +100,7 @@ class ChargeConfig{
 
     public function countSummaryByDate($date){
         try{
-            $stm = $this->conn->prepare('SELECT SUM(chargeAmount) as total FROM charges WHERE Users_idUser = ? AND chargeExpiryDate >= ? OR chargeExpiryDate = "0000-00-00"');
+            $stm = $this->conn->prepare('SELECT SUM(chargeAmount) as total FROM charges WHERE Users_idUser = ? AND (chargeExpiryDate >= ? OR chargeExpiryDate = "0000-00-00")');
             $stm->execute([$this->Users_idUser, $date]);
             $result = $stm->fetch();
             return $result['total'];
@@ -137,8 +137,8 @@ class ChargeConfig{
 
     public function fetchCharge(){
         try{
-            $stm = $this->conn->prepare('SELECT * FROM charges WHERE idCharge = ?');
-            $stm->execute([$this->idCharge]);
+            $stm = $this->conn->prepare('SELECT * FROM charges WHERE idCharge = ? and Users_idUser = ?');
+            $stm->execute([$this->idCharge, $this->Users_idUser]);
             return $stm->fetch();
         }
         catch(PDOException $e){

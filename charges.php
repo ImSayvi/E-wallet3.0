@@ -3,6 +3,7 @@
 
 $charge = new ChargeConfig();
 $charge->setUsers_idUser($_SESSION['idUser']);
+var_dump($_SESSION['idUser']);
 
 // inserting charge
 if(isset($_POST['save_charge'])){
