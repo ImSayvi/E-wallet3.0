@@ -4,8 +4,6 @@ include_once('phplib/classes/budgetClass.php');
 $budget = new BudgetConfig();
 $budget->setUsers_idUser($_SESSION['idUser']);
 
-var_dump($_SESSION['idUser']);
-
 
 //insertowanie budżetu
 if(isset($_POST['save_budget'])){

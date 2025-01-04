@@ -131,7 +131,7 @@ class BudgetConfig{
     
             $stm = $this->conn->prepare("SELECT * FROM dailytransactions WHERE Users_idUser = ?");
             $stm->execute([$this->Users_idUser]);
-            $dailyOutcome = $stm->fetchAll(); 
+            $dailyOutcome = $stm->fetchAll();
     
             $inserted = false;
     
@@ -141,28 +141,28 @@ class BudgetConfig{
                         // Sprawdź, czy rekord już istnieje
                         $stm = $this->conn->prepare("
                             SELECT COUNT(*) FROM budgethistory 
-                            WHERE Users_idUser = ? AND Budget_idBudget = ? AND BHdate = ? AND BHamount = ?
+                            WHERE Users_idUser = ? AND Budget_idBudget = ? AND idDT = ?
                         ");
                         $stm->execute([
                             $this->Users_idUser,
                             $category['idBudget'],
-                            $value['DTdate'],
-                            $value['DTamount']
+                            $value['idDT']
                         ]);
     
                         $exists = $stm->fetchColumn();
     
                         if (!$exists) {
                             $stm = $this->conn->prepare("
-                                INSERT INTO budgethistory (Users_idUser, Budget_idBudget, BHdate, BHamount, idBudgetHistory) 
+                                INSERT INTO budgethistory (Users_idUser, Budget_idBudget, BHdate, BHamount, idDT) 
                                 VALUES (?, ?, ?, ?, ?)
                             ");
+                            $formattedDate = date('Y-m-d', strtotime($value['DTdate']));
                             $stm->execute([
                                 $this->Users_idUser,
                                 $category['idBudget'],
-                                $value['DTdate'],
+                                $formattedDate,
                                 $value['DTamount'],
-                                '0'
+                                $value['idDT']
                             ]);
                             $inserted = true;
                         }
@@ -170,11 +170,10 @@ class BudgetConfig{
                 }
             }
     
-            return $inserted; 
+            return $inserted;
         } catch (PDOException $e) {
             error_log("Database error in insertIntoBudgetHistory: " . $e->getMessage());
-            echo "Wystąpił błąd podczas wstawiania do historii budżetu.";
-            return false;
+            return ['success' => false, 'error' => $e->getMessage()];
         }
     }
     
