@@ -86,12 +86,18 @@ CREATE TABLE BudgetHistory (
   idBudgetHistory INT UNSIGNED NOT NULL AUTO_INCREMENT,
   Budget_idBudget INT UNSIGNED NOT NULL,
   Users_idUser INT UNSIGNED NOT NULL,
+  idDT INT UNSIGNED NOT NULL,
   BHamount DECIMAL(10, 2) NOT NULL,
   BHdate DATE NOT NULL,
   PRIMARY KEY (idBudgetHistory),
   INDEX FK_BudgetHistory_Budget (Budget_idBudget, Users_idUser),
+  INDEX FK_BudgetHistory_DailyTransactions (idDT),
   FOREIGN KEY (Budget_idBudget, Users_idUser)
-    REFERENCES Budget (idBudget, Users_idUser)  
+    REFERENCES Budget (idBudget, Users_idUser)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (idDT)
+    REFERENCES dailytransactions(idDT)
     ON DELETE CASCADE
     ON UPDATE CASCADE
 );
