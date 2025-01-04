@@ -196,5 +196,42 @@ if (isset($_POST['edit_budget']) && isset($_GET['req']) && $_GET['req'] == 'edit
         </div>
     </div>
 
+    <script>
+        document.querySelectorAll('.progress-bar').forEach(function(bar) {
+            let width = parseInt(bar.style.width);  
+            let parentCard = bar.closest('.card');  
+
+            
+            if (width === 100) {
+                bar.classList.remove('bg-success', 'bg-warning', 'bg-danger');
+                bar.classList.add('bg-info');
+            } else if (width >= 70) {
+                bar.classList.remove('bg-info', 'bg-warning', 'bg-danger');
+                bar.classList.add('bg-success');
+            } else if (width >= 40) {
+                bar.classList.remove('bg-info', 'bg-success', 'bg-danger');
+                bar.classList.add('bg-warning');
+            } else {
+                bar.classList.remove('bg-info', 'bg-success', 'bg-warning');
+                bar.classList.add('bg-danger');
+            }
+
+           
+            if (parentCard) {
+                parentCard.classList.remove('border-left-info', 'border-left-success', 'border-left-warning', 'border-left-danger');
+                if (width === 100) {
+                    parentCard.classList.add('border-left-info');
+                } else if (width >= 70) {
+                    parentCard.classList.add('border-left-success');
+                } else if (width >= 40) {
+                    parentCard.classList.add('border-left-warning');
+                } else {
+                    parentCard.classList.add('border-left-danger');
+                }
+            }
+        });
+
+    </script>    
+
  
     <?php include ('includes/footer.php'); ?>
