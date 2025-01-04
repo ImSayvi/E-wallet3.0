@@ -19,4 +19,7 @@
     -poprawić: jeśli wpłacone przekracza założone, zacząć odejmować od total    
 
 -walidacja
-    -czy wprowadzana nazwa katgorii już gdzies nie wystepuje    
+    -czy wprowadzana nazwa katgorii już gdzies nie wystepuje
+
+
+usuwanie z historii budżetu razem z usuwnaiem z DT 

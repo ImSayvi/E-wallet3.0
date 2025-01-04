@@ -70,7 +70,7 @@ if (isset($_POST['edit_budget']) && isset($_GET['req']) && $_GET['req'] == 'edit
                                                         </div>
                                                         <div class="col">
                                                             <div class="progress progress-sm mr-2">
-                                                                <div class="progress-bar bg-info" role="progressbar" style="width: <?= $budget->countPercent($budgets['budgetAmount'], abs($budget->getBudgetTotal($budgets['idBudget']))) ?>%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                <div class="progress-bar bg-info" role="progressbar" style="width: <?= $budget->countPercent($budgets['budgetAmount'], -$budget->getBudgetTotal($budgets['idBudget'])) ?>%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
                                                             </div>
                                                         </div>
                                                     </div>
