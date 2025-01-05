@@ -151,7 +151,7 @@ class ChargeConfig{
             $stm = $this->conn->prepare('SELECT sum(dt.DTamount) as sum from dailytransactions dt join charges ch on dt.DTname = ch.chargeCategory where ch.idCharge = ? and dt.Users_idUser = ?');
             $stm->execute([$idCharge, $this->Users_idUser]);
             $sum = $stm->fetch();
-            return abs($sum['sum']) ?? 0;
+            return abs($sum['sum']) ?? 'Brak';
         }
         catch(PDOException $e){
             echo $e->getMessage();

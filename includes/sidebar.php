@@ -1,6 +1,11 @@
 <?php
 include_once('phplib/classes/chargeClass.php');
 
+$charge = new ChargeConfig();
+$charge->setUsers_idUser($_SESSION['idUser']);
+$allChargesBydate = $charge->fetchAllChargesByDate();
+
+
 ?>
 
 <!-- Sidebar -->
@@ -74,9 +79,9 @@ include_once('phplib/classes/chargeClass.php');
     <div id="collapseToPayCharges" class="collapse show" aria-labelledby="headingUtilities"
         data-parent="#accordionSidebar">
         <div class="bg-white py-2 collapse-inner rounded">
-        <?php //foreach($allChargesBydate as $charge): ?>
-            <a class="collapse-item" href="charges.php">nazwa <span class="text-danger float-right">kwota</span></a>
-        <?php //endforeach; ?>    
+        <?php foreach($allChargesBydate as $charges): ?>
+            <a class="collapse-item chargeToPay" href="charges.php"><?=$charges['chargeCategory'] ?> <div class="float-right paid"><?=$charge->fetchSum($charges['idCharge'])?></div><span class="d-none total"><?=$charges['chargeAmount'] ?></span></a>
+        <?php endforeach; ?>    
         </div>
     </div>
 </li>
@@ -126,4 +131,28 @@ include_once('phplib/classes/chargeClass.php');
             }
         });
     });
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const elements = document.querySelectorAll(".chargeToPay");
+
+    elements.forEach(element => {
+        const paidElement = element.querySelector(".paid");
+        const totalElement = element.querySelector(".total");
+
+        if (paidElement && totalElement) {
+            const paidValue = parseFloat(paidElement.textContent);
+            const totalValue = parseFloat(totalElement.textContent);
+
+            if (paidValue < totalValue) {
+                paidElement.classList.add("text-danger");
+            } else if (paidValue >= totalValue) {
+                paidElement.classList.add("text-success");
+                element.classList.add("text-decoration-line-through");
+                paidElement.classList.add("text-decoration-line-through");
+                console.log(elements);
+            }
+        }
+    });
+});
+
 </script> 
