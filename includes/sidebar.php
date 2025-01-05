@@ -18,7 +18,7 @@ include_once('phplib/classes/chargeClass.php');
 <hr class="sidebar-divider my-0">
 
 <!-- Nav Item - Dashboard -->
-<li class="nav-item active">
+<li class="nav-item">
     <a class="nav-link" href="index.php">
         <i class="fas fa-fw fa-tachometer-alt"></i>
         <span>Panel główny</span></a>
@@ -108,3 +108,22 @@ include_once('phplib/classes/chargeClass.php');
 
 </ul>
 <!-- End of Sidebar -->
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const currentPage = window.location.pathname.split("/").pop();
+
+        const navLinks = document.querySelectorAll(".nav-item a.nav-link");
+
+        navLinks.forEach(link => {
+
+            const linkPage = link.getAttribute("href");
+
+            if (linkPage === currentPage) {
+                link.parentElement.classList.add("active");
+            } else {
+                link.parentElement.classList.remove("active");
+            }
+        });
+    });
+</script> 
