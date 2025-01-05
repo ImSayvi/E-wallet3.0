@@ -10976,6 +10976,10 @@ form.user .btn-user {
   width: 12.5rem;
 }
 
+.text-decoration-line-through {
+  text-decoration: line-through;
+}
+
 
 
 @-webkit-keyframes noise-anim {

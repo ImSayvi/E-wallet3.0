@@ -111,10 +111,6 @@ class BudgetConfig{
         }
     }
 
-    public function putIntoBudgetHistory() {
-       
-    }
-
     public function getBudgetHistory(){
         $stm = $this->conn->prepare("SELECT * FROM budgethistory WHERE Users_idUser = ? AND idBudget = ?");
         $stm->execute([$this->Users_idUser, $this->idBudget]);
@@ -209,7 +205,6 @@ class BudgetConfig{
             $incomeDates->setUsers_idUser($this->Users_idUser);
             $lastIncomeData = $incomeDates->lastIncomeDateAndPlusMonth();
     
-            // Filtrowanie wyników bez użycia array_filter
             $filteredResult = [];
             foreach ($result as $row) {
                 

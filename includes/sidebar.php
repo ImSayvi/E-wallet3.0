@@ -5,6 +5,10 @@ $charge = new ChargeConfig();
 $charge->setUsers_idUser($_SESSION['idUser']);
 $allChargesBydate = $charge->fetchAllChargesByDate();
 
+$budget = new BudgetConfig();
+$budget->setUsers_idUser($_SESSION['idUser']);
+$fetchBudgets = $budget->getAllBudgets();
+
 
 ?>
 
@@ -80,7 +84,7 @@ $allChargesBydate = $charge->fetchAllChargesByDate();
         data-parent="#accordionSidebar">
         <div class="bg-white py-2 collapse-inner rounded">
         <?php foreach($allChargesBydate as $charges): ?>
-            <a class="collapse-item chargeToPay" href="charges.php"><?=$charges['chargeCategory'] ?> <div class="float-right paid"><?=$charge->fetchSum($charges['idCharge'])?></div><span class="d-none total"><?=$charges['chargeAmount'] ?></span></a>
+            <a class="collapse-item chargeToPay" href="charges.php"><?=$charges['chargeCategory'] ?> <div class="float-right paid font-weight-bold"><?=$charge->fetchSum($charges['idCharge'])?></div><span class="d-none total"><?=$charges['chargeAmount'] ?></span></a>
         <?php endforeach; ?>    
         </div>
     </div>
@@ -92,13 +96,14 @@ $allChargesBydate = $charge->fetchAllChargesByDate();
         aria-expanded="true" aria-controls="collapseUtilities">
         <span>Budżet</span>
     </a>
-    <div id="collapseLeftBudget" class="collapse" aria-labelledby="headingLeftBudget"
+    <div id="collapseLeftBudget" class="collapse show" aria-labelledby="headingLeftBudget"
         data-parent="#accordionSidebar">
         <div class="bg-white py-2 collapse-inner rounded">
-            <a class="collapse-item" href="budget.php">Colors</a>
-            <a class="collapse-item" href="budget.php">Borders</a>
-            <a class="collapse-item" href="budget.php">Animations</a>
-            <a class="collapse-item" href="budget.php">Other</a>
+
+        <?php foreach($fetchBudgets as $budgets): ?>    
+            <a class="collapse-item" href="budget.php"><?=$budgets['budgetCategory'] ?><div class="float-right font-weight-bold"><?= $budgets['budgetAmount'] + $budget->getBudgetTotal($budgets['idBudget']) ?></div><span class="d-none total"><?=$budgets['budgetAmount'] ?></span></a>
+        <?php endforeach; ?>      
+
         </div>
     </div>
 </li>
