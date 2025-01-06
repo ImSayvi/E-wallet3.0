@@ -169,12 +169,20 @@ $fetchBudgets = $budget->getAllBudgets();
         const elements = document.querySelectorAll(".budget");
  
             elements.forEach(element => {
-                const availableBudget = document.querySelector(".availableBudget");
-                const totalBudget = document.querySelector(".totalBudget");
+                const availableBudget = element.querySelector(".availableBudget");
+                const totalBudget = element.querySelector(".totalBudget");
 
                 if(availableBudget && totalBudget){
                     const availableBudgetValue = parseFloat(availableBudget.textContent);
-                    const totalBudget = parseFloat(totalBudget.textContent);
+                    const totalBudgetValue = parseFloat(totalBudget.textContent);
+
+                    if (availableBudgetValue == totalBudgetValue){
+                        availableBudget.classList.add("text-info");
+                    }else if (availableBudgetValue < (0.7 * totalBudgetValue)){
+                        availableBudget.classList.add("text-warning");
+                    }else if (availableBudgetValue < (0.4 * totalBudgetValue)){
+                        availableBudget.classList.add("text-danger");
+                    }
                 }
             })
     })

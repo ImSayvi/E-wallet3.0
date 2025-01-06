@@ -1,29 +1,29 @@
 <?php include ('includes/header.php'); ?>
 
 <!-- modal na dodawanie wydatkow obowiazkowych -->
-<div class="modal fade" id="expensemodal" tabindex="-1" role="dialog" aria-labelledby="expenseModalLabel" aria-hidden="true">
+<div class="modal fade" id="savingmodal" tabindex="-1" role="dialog" aria-labelledby="savingModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">Dodawanie składowej konta oszczęsnościowego</h5>
-                <button class="close" type="button" data-bs-dismiss="modal" aria-label="Close" onclick="clearInputs()">
+                <h5 class="modal-title">Dodawanie składowej konta oszczęsnościowego</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close" onclick="clearInputs()">
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
             <form method="POST" action="income.php">
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="mandatoryAmount" class="form-label">Kwota</label>
-                        <input type="number" class="form-control" id="mandatoryAmount" name="mandatoryAmount" autocomplete="off" required>
+                        <label for="savingAmount" class="form-label">Kwota</label>
+                        <input type="number" class="form-control" id="savingAmount" name="savingAmount" autocomplete="off" required>
                     </div>
                     <div class="mb-3">
-                        <label for="mandatoryCategory" class="form-label">Nazwa</label>
-                        <input type="text" class="form-control" id="mandatoryCategory" name="mandatoryCategory" required>
+                        <label for="savingCategory" class="form-label">Nazwa</label>
+                        <input type="text" class="form-control" id="savingCategory" name="savingCategory" required>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
-                    <button type="submit" class="btn btn-primary" name="save_mandatory">Wprowadź</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" class="btn btn-primary" name="save_saving">Wprowadź</button>
                 </div>
             </form>
         </div>
@@ -83,7 +83,7 @@
                 <div class="card-header py-3 d-flex justify-content-between">
                     <h5 class="m-0 font-weight-bold text-primary d-flex align-items-center">W skład Twoich oszczędności wchodzi:</h5>
                     <div class="button-container">
-                        <button type="button" class="btn btn-primary" id="expenseBtn" data-bs-toggle="modal" data-bs-target="#expensemodal">Dodaj składową <i class="fa-solid fa-plus"></i></button>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#savingmodal">Dodaj składową <i class="fa-solid fa-plus"></i></button>
                     </div>
                 </div>
                 <div class="card-body">
