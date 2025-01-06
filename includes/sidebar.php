@@ -11,6 +11,11 @@ $fetchBudgets = $budget->getAllBudgets();
 
 
 ?>
+<style>
+.text-decoration-line-through {
+  text-decoration: line-through;
+}
+</style>    
 
 <!-- Sidebar -->
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
@@ -101,7 +106,7 @@ $fetchBudgets = $budget->getAllBudgets();
         <div class="bg-white py-2 collapse-inner rounded">
 
         <?php foreach($fetchBudgets as $budgets): ?>    
-            <a class="collapse-item" href="budget.php"><?=$budgets['budgetCategory'] ?><div class="float-right font-weight-bold"><?= $budgets['budgetAmount'] + $budget->getBudgetTotal($budgets['idBudget']) ?></div><span class="d-none total"><?=$budgets['budgetAmount'] ?></span></a>
+            <a class="collapse-item budget" href="budget.php"><?=$budgets['budgetCategory'] ?><div class="float-right font-weight-bold availableBudget"><?= $budgets['budgetAmount'] + $budget->getBudgetTotal($budgets['idBudget']) ?></div><span class="d-none totalBudget"><?=$budgets['budgetAmount'] ?></span></a>
         <?php endforeach; ?>      
 
         </div>
@@ -139,25 +144,39 @@ $fetchBudgets = $budget->getAllBudgets();
 
     document.addEventListener("DOMContentLoaded", function () {
     const elements = document.querySelectorAll(".chargeToPay");
+    
+        elements.forEach(element => {
+            const paidElement = element.querySelector(".paid");
+            const totalElement = element.querySelector(".total");
 
-    elements.forEach(element => {
-        const paidElement = element.querySelector(".paid");
-        const totalElement = element.querySelector(".total");
+            if (paidElement && totalElement) {
+                const paidValue = parseFloat(paidElement.textContent);
+                const totalValue = parseFloat(totalElement.textContent);
 
-        if (paidElement && totalElement) {
-            const paidValue = parseFloat(paidElement.textContent);
-            const totalValue = parseFloat(totalElement.textContent);
-
-            if (paidValue < totalValue) {
-                paidElement.classList.add("text-danger");
-            } else if (paidValue >= totalValue) {
-                paidElement.classList.add("text-success");
-                element.classList.add("text-decoration-line-through");
-                paidElement.classList.add("text-decoration-line-through");
-                console.log(elements);
+                if (paidValue < totalValue) {
+                    paidElement.classList.add("text-danger");
+                } else if (paidValue >= totalValue) {
+                    paidElement.classList.add("text-success");
+                    element.classList.add("text-decoration-line-through");
+                    paidElement.classList.add("text-decoration-line-through");
+                    console.log(element);
+                }
             }
-        }
+        });
     });
-});
+
+    document.addEventListener("DOMContentLoaded", function (){
+        const elements = document.querySelectorAll(".budget");
+ 
+            elements.forEach(element => {
+                const availableBudget = document.querySelector(".availableBudget");
+                const totalBudget = document.querySelector(".totalBudget");
+
+                if(availableBudget && totalBudget){
+                    const availableBudgetValue = parseFloat(availableBudget.textContent);
+                    const totalBudget = parseFloat(totalBudget.textContent);
+                }
+            })
+    })
 
 </script> 

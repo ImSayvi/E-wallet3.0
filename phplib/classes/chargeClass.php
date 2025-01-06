@@ -148,8 +148,12 @@ class ChargeConfig{
 
     public function fetchSum($idCharge){
         try{
-            $stm = $this->conn->prepare('SELECT sum(dt.DTamount) as sum from dailytransactions dt join charges ch on dt.DTname = ch.chargeCategory where ch.idCharge = ? and dt.Users_idUser = ?');
-            $stm->execute([$idCharge, $this->Users_idUser]);
+            $income = new IncomeConfig();
+            $income->setUsers_idUser($this->Users_idUser);
+            $dates = $income->lastIncomeDateAndPlusMonth();
+
+            $stm = $this->conn->prepare('SELECT sum(dt.DTamount) as sum from dailytransactions dt join charges ch on dt.DTname = ch.chargeCategory where ch.idCharge = ? and dt.Users_idUser = ? and dt.DTdate >= ? and dt.DTdate <= ?');
+            $stm->execute([$idCharge, $this->Users_idUser, $dates[0], $dates[1]]);
             $sum = $stm->fetch();
             return abs($sum['sum']) ?? 'Brak';
         }
