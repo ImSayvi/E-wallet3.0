@@ -47,9 +47,10 @@ if (isset($_POST['edit_charge']) && isset($_GET['req']) && $_GET['req'] == 'edit
         $charge->setChargeAddDate(date('Y-m-d'));
 
         $charge->updateCharge();
-        
-        
 }
+
+//data for charts:
+
 
 
 
@@ -131,22 +132,16 @@ if (isset($_POST['edit_charge']) && isset($_GET['req']) && $_GET['req'] == 'edit
                             <?php foreach ($allChargesBydate as $charges): ?>
                                 <tr>
                                     <td><?= $charges['chargeCategory'] ?></td>
-                                    <td><?= $charges['chargeAmount'] ?></td>
+                                    <td class="charge-amount"><?= $charges['chargeAmount'] ?></td>
                                     <td><?= $charge->fetchSum($charges['idCharge']) ?></td>
                                     <td><?= $charge->fetchDate($charges['idCharge']) ?></td>
                                     <td class="text-center">
-                                    <a href="charges.php?idCharge=<?= $charges['idCharge']?>&req=edit" 
-                                        class="btn btn-warning btn-circle btn-sm edit-charge-btn" 
-                                        data-target="#editCharge<?= $charges['idCharge']?>"
-                                        data-toggle = "modal"
-                                        >
-                                        <i class="fa-regular fa-pen-to-square"></i>
-                                    </a>
-                                           <?php 
-                                           $editModal = new ModalCreator();
-                                           echo $editModal->createEditChargesModal($charges['idCharge'], $charges['chargeAmount'], $charges['chargeCategory'], $charges['chargeExpiryDate']);
-                                           ?>
-                                        
+                                        <a href="charges.php?idCharge=<?= $charges['idCharge']?>&req=edit" 
+                                           class="btn btn-warning btn-circle btn-sm edit-charge-btn" 
+                                           data-target="#editCharge<?= $charges['idCharge']?>"
+                                           data-toggle="modal">
+                                            <i class="fa-regular fa-pen-to-square"></i>
+                                        </a>
                                         <a href="charges.php?idCharge=<?= $charges['idCharge'] ?>&req=delete" 
                                            class="btn btn-danger btn-circle btn-sm">
                                            <i class="fas fa-trash"></i>
@@ -170,7 +165,7 @@ if (isset($_POST['edit_charge']) && isset($_GET['req']) && $_GET['req'] == 'edit
                 </div>
                 <div class="card-body">
                     <div class="chart-pie pt-4">
-                        <canvas id="myPieChart"></canvas>
+                        <canvas id="myPieChart"></canvas> 
                     </div>
                     <hr>
                     Styling for the donut chart can be found in the
@@ -179,46 +174,51 @@ if (isset($_POST['edit_charge']) && isset($_GET['req']) && $_GET['req'] == 'edit
             </div>
         </div>
     </div>
-
-    <!-- Content Row -->
-    <div class="row">
-        <div class="col-xl-8 col-lg-7">
-            <!-- Bar Chart -->
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Bar Chart</h6>
-                </div>
-                <div class="card-body">
-                    <div class="chart-bar">
-                        <canvas id="myBarChart"></canvas>
-                    </div>
-                    <hr>
-                    Styling for the bar chart can be found in the
-                    <code>/js/demo/chart-bar-demo.js</code> file.
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
-<!-- Logout Modal-->
-<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Na pewno chcesz się wylogować?</h5>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">Wybierz "wyloguj" aby zakończyć sesję.</div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" data-dismiss="modal">Zamknij</button>
-                <a class="btn btn-primary" href="login.html">Wyloguj</a>
-            </div>
-        </div>
-    </div>
-</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Przygotowanie danych do wykresu donut
+    var chargeCategories = [];
+    var chargeAmounts = [];
+
+    // Pobranie danych z tabeli HTML (zmieniony selektor na #dataTable tbody)
+    document.querySelectorAll('#dataTable tbody tr').forEach(function(row) {
+        var category = row.cells[0].innerText.trim();  // Kategoria (Na co)
+        var amount = parseFloat(row.cells[1].innerText.trim());  // Przeznaczone (Kwota)
+
+        chargeCategories.push(category);
+        chargeAmounts.push(amount);
+    });
+
+    var ctx = document.getElementById('myPieChart').getContext('2d');
+    var myDonutChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: chargeCategories,  // Etykiety (Kategorie)
+        datasets: [{
+            label: 'Przeznaczone na opłaty',
+            data: chargeAmounts,  // Dane (Kwoty)
+            backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'],  // Kolory segmentów wykresu
+            hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf', '#f1b91e', '#d13c2f'], // Kolory przy najechaniu
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: true, // Wyświetlanie legendy
+                position: 'right', // Przesunięcie legendy na prawą stronę
+            },
+        },
+        cutout: '70%', // Ustawienie, aby stworzyć efekt donut
+    }
+});
+
+
+</script>
+
 
 
 <?php include ('includes/footer.php'); ?>

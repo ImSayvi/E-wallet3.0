@@ -216,5 +216,47 @@ $total->calculateUserTotal();
             window.addEventListener('load', function() {
                 document.querySelector(".date").value = setTodayDate();
             });
+
+
+            
         </script>
 
+<script>
+    // Przygotowanie danych do wykresu słupkowego
+    var incomeData = <?php echo json_encode($allIncomes); ?>;
+    var labels = incomeData.map(function(item) {
+        return item.incomeName; // Nazwy źródeł jako etykiety
+    });
+    var data = incomeData.map(function(item) {
+        return item.incomeAmount; // Kwoty jako dane
+    });
+
+    // Konfiguracja wykresu słupkowego w Chart.js
+    var ctx = document.getElementById('myBarChart').getContext('2d');
+    var myBarChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels, // Używamy nazw źródeł jako etykiety
+            datasets: [{
+                label: 'Wypłata/ wpływy',
+                data: data, // Używamy kwot jako danych
+                backgroundColor: 'rgba(0, 123, 255, 0.5)', // Kolor słupków
+                borderColor: 'rgba(0, 123, 255, 1)', // Kolor krawędzi słupków
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false // Ukrywamy legendę
+                },
+            },
+            scales: {
+                y: {
+                    beginAtZero: true // Skala osi Y zaczyna się od zera
+                }
+            }
+        }
+    });
+</script>

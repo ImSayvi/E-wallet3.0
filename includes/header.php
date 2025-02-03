@@ -39,7 +39,12 @@ if (!isset($_SESSION['logged'])) {
     <link href="assets/css/sb-admin-2.min.css" rel="stylesheet">
 
     <!-- css dla datatables -->
-    <link href="assets/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap4.min.css">
+
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="/assets/js/script.js" async></script>
 
     <style>
         .amount {
