@@ -3,6 +3,12 @@
 
 $charge = new ChargeConfig();
 $charge->setUsers_idUser($_SESSION['idUser']);
+$budget = new BudgetConfig();
+$budget->setUsers_idUser($_SESSION['idUser']);
+$income = new IncomeConfig();
+$income->setUsers_idUser($_SESSION['idUser']);
+$lastIncome = $income->fetchLastIncome();
+
 
 
 // inserting charge
@@ -50,7 +56,8 @@ if (isset($_POST['edit_charge']) && isset($_GET['req']) && $_GET['req'] == 'edit
 }
 
 //data for charts:
-
+$budgetSum = $budget->countSummary();
+$lastIncNum = $lastIncome[0]['incomeAmount'];
 
 
 
@@ -148,6 +155,10 @@ if (isset($_POST['edit_charge']) && isset($_GET['req']) && $_GET['req'] == 'edit
                                         </a>
                                     </td>
                                 </tr>
+                                <?php 
+                                    $editModal = new ModalCreator();
+                                    echo $editModal->createEditChargesModal($charges['idCharge'], $charges['chargeAmount'], $charges['chargeCategory'], $charges['chargeExpiryDate']);
+                                ?>
                             <?php endforeach; ?>   
 
                             </tbody>
@@ -161,15 +172,12 @@ if (isset($_POST['edit_charge']) && isset($_GET['req']) && $_GET['req'] == 'edit
         <div class="col-xl-4 col-lg-5">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Donut Chart</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Wykres</h6>
                 </div>
                 <div class="card-body">
-                    <div class="chart-pie pt-4">
+                    <div class="chart-pie d-flex justify-content-center h-100">
                         <canvas id="myPieChart"></canvas> 
                     </div>
-                    <hr>
-                    Styling for the donut chart can be found in the
-                    <code>/js/demo/chart-pie-demo.js</code> file.
                 </div>
             </div>
         </div>
@@ -181,6 +189,9 @@ if (isset($_POST['edit_charge']) && isset($_GET['req']) && $_GET['req'] == 'edit
     // Przygotowanie danych do wykresu donut
     var chargeCategories = [];
     var chargeAmounts = [];
+    let lastInc = <?= $lastIncNum ?>;
+    let budgetSum = <?= $budgetSum ?>;
+    let incLeft = lastInc - budgetSum - <?= $charge->countSummaryByDate(date('Y-m-d')) ?>;
 
     // Pobranie danych z tabeli HTML (zmieniony selektor na #dataTable tbody)
     document.querySelectorAll('#dataTable tbody tr').forEach(function(row) {
@@ -190,6 +201,12 @@ if (isset($_POST['edit_charge']) && isset($_GET['req']) && $_GET['req'] == 'edit
         chargeCategories.push(category);
         chargeAmounts.push(amount);
     });
+
+    chargeCategories.push('dla mnie');
+    chargeCategories.push('budżety');
+
+    chargeAmounts.push(incLeft);
+    chargeAmounts.push(budgetSum);
 
     var ctx = document.getElementById('myPieChart').getContext('2d');
     var myDonutChart = new Chart(ctx, {
@@ -209,10 +226,10 @@ if (isset($_POST['edit_charge']) && isset($_GET['req']) && $_GET['req'] == 'edit
         plugins: {
             legend: {
                 display: true, // Wyświetlanie legendy
-                position: 'right', // Przesunięcie legendy na prawą stronę
+                position: 'right', 
             },
         },
-        cutout: '70%', // Ustawienie, aby stworzyć efekt donut
+        cutout: '50%', 
     }
 });
 

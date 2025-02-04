@@ -242,6 +242,15 @@ class BudgetConfig{
             return 100 - round(($actuall / $total) * 100, 2);
         }
     }
+    
+    public function countSummary(){
+
+        $stm = $this->conn->prepare("SELECT SUM(budgetAmount) FROM budget WHERE Users_idUser = ?");
+        $stm->execute([$this->Users_idUser]);
+        $result = $stm->fetchColumn();
+
+        return $result;
+    }
 }
 
 ?>
