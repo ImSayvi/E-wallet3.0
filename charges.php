@@ -3,8 +3,10 @@
 
 $charge = new ChargeConfig();
 $charge->setUsers_idUser($_SESSION['idUser']);
-$budget = new BudgetConfig();
-$budget->setUsers_idUser($_SESSION['idUser']);
+
+$total = new TotalConfig();
+$total->setIdUser($_SESSION['idUser']);
+
 $income = new IncomeConfig();
 $income->setUsers_idUser($_SESSION['idUser']);
 $lastIncome = $income->fetchLastIncome();
@@ -56,7 +58,7 @@ if (isset($_POST['edit_charge']) && isset($_GET['req']) && $_GET['req'] == 'edit
 }
 
 //data for charts:
-$budgetSum = $budget->countSummary();
+$budgetSum = $total->totalBudget();
 $lastIncNum = $lastIncome[0]['incomeAmount'];
 
 
@@ -178,6 +180,8 @@ $lastIncNum = $lastIncome[0]['incomeAmount'];
                     <div class="chart-pie d-flex justify-content-center h-100">
                         <canvas id="myPieChart"></canvas> 
                     </div>
+                    <hr>
+                    "Budżety" ujmuje jedynie te, które są oznaczone jako "przechowywane na koncie głównym".
                 </div>
             </div>
         </div>

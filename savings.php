@@ -1,16 +1,37 @@
-<?php include ('includes/header.php'); ?>
+<?php include ('includes/header.php'); 
+
+$saving = new SayvinConfig();
+$saving->setUsers_idUser($_SESSION['idUser']);
+
+if(isset($_POST['save_saving'])){
+    $savingAmount = $_POST['savingAmount'];
+    $savingCategory = $_POST['savingCategory'];
+    $isActualSaving = $_POST['isSaving'];
+
+    $saving->setSavingAmount($savingAmount);
+    $saving->setSavingCategory($savingCategory);
+    $saving->setIsActualSaving($isActualSaving);
+    $saving->insertSaving();
+}
+
+
+if(isset($_GET['req']) && $_GET['req'] == 'delete'){
+    $saving->setUsers_idUser($_SESSION['idUser']);
+    $saving->deleteSaving();
+}
+?>
 
 <!-- modal na dodawanie wydatkow obowiazkowych -->
 <div class="modal fade" id="savingmodal" tabindex="-1" role="dialog" aria-labelledby="savingModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Dodawanie składowej konta oszczęsnościowego</h5>
+                <h5 class="modal-title">Dodawanie składowej konta oszczędnościowego</h5>
                 <button class="close" type="button" data-dismiss="modal" aria-label="Close" onclick="clearInputs()">
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
-            <form method="POST" action="income.php">
+            <form method="POST" action="savings.php">
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="savingAmount" class="form-label">Kwota</label>
@@ -20,6 +41,19 @@
                         <label for="savingCategory" class="form-label">Nazwa</label>
                         <input type="text" class="form-control" id="savingCategory" name="savingCategory" required>
                     </div>
+                    <div class="form-group">
+                            <label for="btn-group">Czy to faktycznie oszczędności?</label>
+                            
+                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                <label class="btn btn-secondary active">
+                                    <input type="radio" name="isSaving" id="trueSaving" value="t" autocomplete="off" checked>Tak, to oszczędności
+                                </label>
+                                <label class="btn btn-secondary">
+                                    <input type="radio" name="isSaving" id="falseSaving" value="f" autocomplete="off">Nie, to budżet
+                                </label>
+                            </div>
+                           
+                        </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
@@ -97,42 +131,28 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                    <?php 
+                                        $allSavings = $saving->getSavings($_SESSION['idUser']);
+                                        foreach($allSavings as $savings):
+                                    ?>
                                 <tr>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
+                                    <td><?=$savings['savingCategory'] ?></td>
+                                    <td><?=$savings['savingAmount'] ?></td>
                                     <td>
-                                        <a href="#" class="btn btn-warning btn-circle btn-sm">
+                                        <a href="savings.php?idSaving=<?=$savings['idSaving'] ?>&req=edit" 
+                                            class="btn btn-warning btn-circle btn-sm">
                                             <i class="fa-regular fa-pen-to-square"></i>
                                         </a>
-                                        <a href="#" class="btn btn-danger btn-circle btn-sm">
+                                        <a href="savings.php?idSaving=<?= $savings['idSaving'] ?>&req=delete" 
+                                            class="btn btn-danger btn-sm mb-1">Usuń
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td>Thornton</td>
-                                    <td>@fat</td>
-                                    <td>
-                                        <a href="#" class="btn btn-warning btn-circle btn-sm">
-                                            <i class="fa-regular fa-pen-to-square"></i>
-                                        </a>
-                                        <a href="#" class="btn btn-danger btn-circle btn-sm">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>the Bird</td>
-                                    <td>@twitter</td>
-                                    <td>
-                                        <a href="#" class="btn btn-warning btn-circle btn-sm">
-                                            <i class="fa-regular fa-pen-to-square"></i>
-                                        </a>
-                                        <a href="#" class="btn btn-danger btn-circle btn-sm">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </td>
-                                </tr>
+                                    <?php
+                                    endforeach;
+                                    ?>
+
                             </tbody>
                         </table>
                     </div>

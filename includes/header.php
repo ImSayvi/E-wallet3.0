@@ -7,6 +7,7 @@ require_once('phplib/classes/chargeClass.php');
 require_once('phplib/classes/budgetClass.php');
 require_once('phplib/classes/dailyClass.php');
 require_once('phplib/classes/totalClass.php');
+require_once('phplib/classes/savingClass.php');
 
 session_start();
 

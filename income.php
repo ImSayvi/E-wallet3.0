@@ -137,8 +137,7 @@ $total->calculateUserTotal();
                                         <canvas id="myBarChart"></canvas>
                                     </div>
                                     <hr>
-                                    Styling for the bar chart can be found in the
-                                    <code>/js/demo/chart-bar-demo.js</code> file.
+                                    Wykres aktualizuje się z każdą wprowadzoną wypłatą.
                                 </div>
                             </div>
                         </div>
